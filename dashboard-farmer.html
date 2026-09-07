@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farmer Dashboard — AgriLink AI</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="dashboard-layout">
+  
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><i data-lucide="tractor"></i> AgriLink AI</div>
+    </div>
+    
+    <nav class="nav-menu">
+      <a href="dashboard-farmer.html" class="nav-item active">Overview</a>
+      <a href="farmer-market-prices.html" class="nav-item">Market Prices</a>
+      <a href="farmer-produce.html" class="nav-item">My Produce</a>
+      <a href="farmer-offers.html" class="nav-item">Buyer Offers</a>
+      <a href="farmer-transactions.html" class="nav-item">Transactions</a>
+      <a href="farmer-logistics.html" class="nav-item">Logistics</a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <a href="index.html" class="nav-item" style="color: #e74c3c; padding: 0;">Log Out</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- Topbar -->
+    <header class="topbar glass-panel">
+      <h2 class="page-title">Overview</h2>
+      <div class="topbar-actions">
+        <button
+    id="notifBtn"
+    class="btn-secondary"
+    style="padding: 8px 16px; display:flex; align-items:center; gap:8px;"
+>
+    <i data-lucide="bell" style="width:16px;height:16px;"></i>
+    Notifications
+</button>
+        <div class="user-profile">
+          <div class="avatar" id="userAvatar">F</div>
+          <span id="userName" style="font-weight: 500;">Farmer User</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container fade-in">
+      
+      <!-- Welcome Section -->
+      <div style="margin-bottom: 32px;">
+        <h1 style="font-size: 28px; margin-bottom: 8px;">Welcome back, <span id="welcomeName">Farmer</span>!</h1>
+        <p style="color: var(--text-muted);">Here is what's happening in your farm business today.</p>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid-cards">
+        <div class="card-3d stat-card">
+          <div class="stat-header">
+            <span>Total Earnings</span>
+            <span class="trend-up">↑ 12%</span>
+          </div>
+          <div class="stat-value">₹45,200</div>
+        </div>
+        
+        <div class="card-3d stat-card">
+          <div class="stat-header">
+            <span>Active Offers</span>
+            <span class="trend-up">↑ 3 New</span>
+          </div>
+          <div class="stat-value">8</div>
+        </div>
+
+        <div class="card-3d stat-card">
+          <div class="stat-header">
+            <span>Pending Transactions</span>
+            <span style="color: #f39c12;">Action Required</span>
+          </div>
+          <div class="stat-value">2</div>
+        </div>
+      </div>
+
+      <!-- AI Recommendations -->
+      <div class="dashboard-section ai-highlight glass-panel-dark">
+        <div class="section-title" style="margin-bottom: 12px; display:flex; align-items:center; gap:8px;">
+          <i data-lucide="bot"></i> <span>AI Market Intelligence</span>
+          <button class="btn-primary" style="font-size: 13px; padding: 8px 16px; margin-left: auto;">View Full Report</button>
+        </div>
+        <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.1); padding: 16px; border-radius: 8px;">
+            <p style="font-weight: 600; margin-bottom: 8px;">Trending Crop: Wheat</p>
+            <p style="font-size: 14px; opacity: 0.9;">Wheat prices have surged by 5% in your district. Consider listing your harvest within the next 48 hours for optimal returns.</p>
+          </div>
+          <div style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.1); padding: 16px; border-radius: 8px;">
+            <p style="font-weight: 600; margin-bottom: 8px;">Buyer Demand</p>
+            <p style="font-size: 14px; opacity: 0.9;">High demand for organic tomatoes from 'Fresh Foods Ltd'. You have a match based on your recent listings.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price Chart & Produce -->
+      <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+        
+        <!-- Chart Section -->
+        <div class="dashboard-section card-3d" style="flex: 2; min-width: 300px;">
+          <div class="section-title">Market Price Trends (₹/Quintal)</div>
+          <canvas id="priceChart" height="200"></canvas>
+        </div>
+
+        <!-- My Produce -->
+        <div class="dashboard-section card-3d" style="flex: 1; min-width: 250px;">
+          <div class="section-title">My Produce</div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            
+            <div style="display: flex; justify-content: space-between; padding: 12px; border: 1px solid #eee; border-radius: 8px;">
+              <div>
+                <div style="font-weight: 600;">Wheat (Grade A)</div>
+                <div style="font-size: 13px; color: var(--text-muted);">50 Quintals</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="color: var(--color-primary); font-weight: 600;">₹2,200/q</div>
+                <div style="font-size: 12px; color: #f39c12;">Listed</div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; padding: 12px; border: 1px solid #eee; border-radius: 8px;">
+              <div>
+                <div style="font-weight: 600;">Rice (Basmati)</div>
+                <div style="font-size: 13px; color: var(--text-muted);">30 Quintals</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="color: var(--text-muted); font-weight: 600;">---</div>
+                <div style="font-size: 12px; color: var(--text-muted);">Unlisted</div>
+              </div>
+            </div>
+
+            <button class="btn-secondary" style="width: 100%; margin-top: 8px;">+ Add Produce</button>
+          </div>
+        </div>
+
+      </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  // User Info Mock
+  const user = localStorage.getItem('agrilink_user') || 'Farmer';
+  document.getElementById('userName').textContent = user;
+  document.getElementById('welcomeName').textContent = user;
+  document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
+
+  // Chart.js Initialization
+  const ctx = document.getElementById('priceChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [
+        {
+          label: 'Wheat',
+          data: [2100, 2150, 2140, 2180, 2200, 2250, 2240],
+          borderColor: '#1b5e20',
+          backgroundColor: 'rgba(27, 94, 32, 0.1)',
+          fill: true,
+          tension: 0.4
+        },
+        {
+          label: 'Rice',
+          data: [3500, 3500, 3550, 3520, 3600, 3650, 3620],
+          borderColor: '#00bfa5',
+          backgroundColor: 'rgba(0, 191, 165, 0.1)',
+          fill: true,
+          tension: 0.4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' }
+      },
+      scales: {
+        y: { beginAtZero: false }
+      }
+    }
+  });
+</script>
+<script src="js/dashboard.js?v=2"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
+<script src="dashboard.js"></script>
+<script src="notifications.js"></script>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Analytics — Admin — AgriLink AI</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><i data-lucide="tractor"></i> AgriLink AI</div>
+    </div>
+    <nav class="nav-menu">
+      <a href="dashboard-admin.html" class="nav-item">Platform Overview</a>
+      <a href="admin-users.html" class="nav-item">User Management</a>
+      <a href="admin-transactions.html" class="nav-item">Transactions</a>
+      <a href="admin-disputes.html" class="nav-item">Disputes</a>
+      <a href="admin-reports.html" class="nav-item">Reports</a>
+      <a href="admin-analytics.html" class="nav-item active">System Analytics</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="index.html" class="nav-item" style="color:#e74c3c;padding:0;">Log Out</a>
+    </div>
+  </aside>
+  <main class="main-content">
+    <header class="topbar glass-panel">
+      <h2 class="page-title">System Analytics</h2>
+      <div class="topbar-actions">
+        <button id="notifBtn" class="btn-secondary" style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><i data-lucide="bell" style="width:16px;height:16px;"></i> Notifications</button>
+        <div class="user-profile">
+          <div class="avatar" id="userAvatar">A</div>
+          <span id="userName" style="font-weight:500;">Admin</span>
+        </div>
+      </div>
+    </header>
+    <div class="dashboard-container fade-in">
+      <div class="grid-cards" style="margin-bottom:24px;">
+        <div class="card-3d stat-card"><div class="stat-header"><span>API Uptime</span><span class="trend-up">Stable</span></div><div class="stat-value" style="color:var(--color-accent);">99.8%</div></div>
+        <div class="card-3d stat-card"><div class="stat-header"><span>Avg Response Time</span></div><div class="stat-value">142ms</div></div>
+        <div class="card-3d stat-card"><div class="stat-header"><span>Active Sessions</span></div><div class="stat-value">284</div></div>
+        <div class="card-3d stat-card"><div class="stat-header"><span>Daily Transactions</span></div><div class="stat-value">47</div></div>
+      </div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
+        <div class="dashboard-section card-3d" style="flex:2;min-width:300px;">
+          <div class="section-title">Daily Active Users (Last 30 Days)</div>
+          <canvas id="dauChart" height="200"></canvas>
+        </div>
+        <div class="dashboard-section card-3d" style="flex:1;min-width:250px;">
+          <div class="section-title">Transactions by Role</div>
+          <canvas id="roleChart" height="200"></canvas>
+        </div>
+      </div>
+      <div class="dashboard-section glass-panel" style="margin-top:24px;">
+        <div class="section-title">System Health</div>
+        <table class="data-table">
+          <thead><tr><th>Component</th><th>Status</th><th>Last Checked</th><th>Latency</th></tr></thead>
+          <tbody>
+            <tr><td>API Gateway</td><td><span class="badge badge-success">Operational</span></td><td>1 min ago</td><td>12ms</td></tr>
+            <tr><td>Database (Primary)</td><td><span class="badge badge-success">Operational</span></td><td>1 min ago</td><td>8ms</td></tr>
+            <tr><td>Payment Service</td><td><span class="badge badge-success">Operational</span></td><td>5 mins ago</td><td>142ms</td></tr>
+            <tr><td>SMS Notification Service</td><td><span class="badge badge-warning" style="background:rgba(243,156,18,0.1);color:#f39c12;">Degraded</span></td><td>5 mins ago</td><td>980ms</td></tr>
+            <tr><td>File Storage (CDN)</td><td><span class="badge badge-success">Operational</span></td><td>10 mins ago</td><td>22ms</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  const user = localStorage.getItem('agrilink_user') || 'System Admin';
+  document.getElementById('userName').textContent = user;
+  document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
+  const daus = [120,145,132,160,178,155,190,210,225,198,240,255,260,245,270,280,265,290,310,295,320,285,300,315,305,320,330,310,284,295];
+  new Chart(document.getElementById('dauChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: daus.map((_,i) => `Day ${i+1}`),
+      datasets: [{ label: 'Active Users', data: daus, borderColor: '#1b5e20', backgroundColor: 'rgba(27,94,32,0.1)', fill: true, tension: 0.4, pointRadius: 2 }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: false } } }
+  });
+  new Chart(document.getElementById('roleChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Farmer→Buyer', 'FPO→Buyer', 'Direct'],
+      datasets: [{ label: 'Transactions', data: [31, 12, 4], backgroundColor: ['rgba(27,94,32,0.7)','rgba(0,191,165,0.7)','rgba(243,156,18,0.7)'] }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+</script>
+<script src="js/dashboard.js?v=3"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

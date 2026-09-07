@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgriLink AI — Login</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* Page specific styles for Login split screen */
+  .login-page {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  .visual-side {
+    flex: 1;
+    background: linear-gradient(135deg, #004d40, #1b5e20);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 40px;
+  }
+
+  /* 3D Visual Concept (CSS Only) */
+  .scene-3d {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    perspective: 1000px;
+    z-index: 0;
+  }
+
+  .node {
+    position: absolute;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(5px);
+    border-radius: 12px;
+    animation: float 6s infinite ease-in-out alternate;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  .node-1 { width: 120px; height: 120px; top: 20%; left: 15%; transform: translateZ(-50px) rotateY(15deg); animation-delay: 0s; }
+  .node-2 { width: 180px; height: 120px; top: 50%; right: 20%; transform: translateZ(50px) rotateY(-20deg); animation-delay: -2s; }
+  .node-3 { width: 100px; height: 100px; bottom: 15%; left: 30%; transform: translateZ(100px) rotateX(20deg); animation-delay: -4s; }
+
+  /* Overlay text */
+  .visual-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 500px;
+  }
+
+  .visual-content h1 {
+    font-size: 48px;
+    margin-bottom: 16px;
+    background: linear-gradient(to right, #fff, #a5d6a7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .visual-content p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #e8f5e9;
+    opacity: 0.9;
+  }
+
+  /* Form Side */
+  .form-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f7f6;
+    position: relative;
+  }
+
+  /* Subtle background pattern for form side */
+  .form-side::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(var(--color-primary-light) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.05;
+  }
+
+  .login-card-container {
+    width: 100%;
+    max-width: 480px;
+    padding: 0 24px;
+    z-index: 1;
+  }
+
+  .role-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    background: rgba(255,255,255,0.5);
+    padding: 6px;
+    border-radius: var(--border-radius-md);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+  }
+
+  .role-btn {
+    flex: 1;
+    padding: 12px 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+  }
+
+  .role-btn.active {
+    background: var(--bg-surface);
+    color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .forgot-link {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .switch-text {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 24px;
+  }
+
+  .error-msg {
+    color: #e74c3c;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 16px;
+    min-height: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .login-page {
+      flex-direction: column;
+    }
+    .visual-side {
+      min-height: 300px;
+      flex: none;
+    }
+    .form-side {
+      padding: 40px 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="login-page">
+    
+    <!-- 3D Visual Side -->
+    <div class="visual-side">
+      <div class="scene-3d">
+        <div class="node node-1"></div>
+        <div class="node node-2"></div>
+        <div class="node node-3"></div>
+      </div>
+      <div class="visual-content fade-in">
+        <h1>AgriLink AI</h1>
+        <p>Smart Market Intelligence & Farmer–Buyer Linkage</p>
+      </div>
+    </div>
+
+    <!-- Form Side -->
+    <div class="form-side">
+      <div class="login-card-container">
+        
+        <div class="card-3d" style="padding: 40px 32px; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px);">
+          <h2 style="font-size: 28px; margin-bottom: 8px; color: var(--text-main);">Welcome Back</h2>
+          <p style="color: var(--text-muted); margin-bottom: 32px;">Please enter your details to sign in.</p>
+
+          <!-- Role Selector -->
+          <div class="role-selector">
+            <button class="role-btn active" data-role="farmer">Farmer</button>
+            <button class="role-btn" data-role="buyer">Buyer</button>
+            <button class="role-btn" data-role="fpo">FPO</button>
+            <button class="role-btn" data-role="admin">Admin</button>
+          </div>
+
+          <form id="loginForm">
+            <div class="input-group">
+              <label for="identifier">Mobile Number / Email</label>
+              <input type="text" id="identifier" placeholder="Enter mobile number or email" required>
+            </div>
+
+            <div class="input-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" placeholder="Enter password" required>
+            </div>
+
+            <p class="error-msg" id="errorMsg"></p>
+
+            <div class="form-options">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                <input type="checkbox" id="remember" style="width: 16px; height: 16px;"> Remember me
+              </label>
+              <a href="#" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%;">
+              Sign In 
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </button>
+          </form>
+
+          <p class="switch-text">
+            New here? <a href="register.html" style="font-weight: 600;">Create an account</a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>

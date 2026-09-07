@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics — FPO — AgriLink AI</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><i data-lucide="tractor"></i> AgriLink AI</div>
+    </div>
+    <nav class="nav-menu">
+      <a href="dashboard-fpo.html" class="nav-item">FPO Overview</a>
+      <a href="fpo-members.html" class="nav-item">Member Farmers</a>
+      <a href="fpo-inventory.html" class="nav-item">Aggregated Produce</a>
+      <a href="fpo-buyers.html" class="nav-item">Buyer Connections</a>
+      <a href="fpo-transactions.html" class="nav-item">Transactions</a>
+      <a href="fpo-analytics.html" class="nav-item active">Analytics</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="index.html" class="nav-item" style="color:#e74c3c;padding:0;">Log Out</a>
+    </div>
+  </aside>
+  <main class="main-content">
+    <header class="topbar glass-panel">
+      <h2 class="page-title">Analytics</h2>
+      <div class="topbar-actions">
+        <button id="notifBtn" class="btn-secondary" style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><i data-lucide="bell" style="width:16px;height:16px;"></i> Notifications</button>
+        <div class="user-profile">
+          <div class="avatar" id="userAvatar">O</div>
+          <span id="userName" style="font-weight:500;">FPO Admin</span>
+        </div>
+      </div>
+    </header>
+    <div class="dashboard-container fade-in">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
+        <div class="dashboard-section card-3d" style="flex:1;min-width:300px;">
+          <div class="section-title">Monthly Revenue Trend (₹ Lakhs)</div>
+          <canvas id="revenueChart" height="200"></canvas>
+        </div>
+        <div class="dashboard-section card-3d" style="flex:1;min-width:300px;">
+          <div class="section-title">Crop Volume by Month (Qtl)</div>
+          <canvas id="cropChart" height="200"></canvas>
+        </div>
+      </div>
+      <div class="dashboard-section glass-panel" style="margin-top:24px;">
+        <div class="section-title">Performance Metrics</div>
+        <table class="data-table">
+          <thead><tr><th>Metric</th><th>Value</th><th>Target</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Average Deal Size</td><td>₹4,82,000</td><td>₹4,00,000</td><td><span class="badge badge-success">Above Target</span></td></tr>
+            <tr><td>Member Retention Rate</td><td>91.6%</td><td>90%</td><td><span class="badge badge-success">On Track</span></td></tr>
+            <tr><td>Top Performing Crop</td><td colspan="2">Wheat (Grade A) — ₹12,50,000 in sales</td><td><span class="badge" style="background:#e8f5e9;color:#2e7d32;">Leader</span></td></tr>
+            <tr><td>Buyer Satisfaction Score</td><td>4.2 / 5</td><td>4.0</td><td><span class="badge badge-success">Above Target</span></td></tr>
+            <tr><td>Avg Days to Close Deal</td><td>8 days</td><td>10 days</td><td><span class="badge badge-success">Efficient</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  const user = localStorage.getItem('agrilink_user') || 'FPO Admin';
+  document.getElementById('userName').textContent = user;
+  document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
+  new Chart(document.getElementById('revenueChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: ['Apr','May','Jun','Jul','Aug','Sep'],
+      datasets: [{ label: 'Revenue (₹L)', data: [18,22,19,28,35,45], borderColor: '#1b5e20', backgroundColor: 'rgba(27,94,32,0.1)', fill: true, tension: 0.4 }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+  });
+  new Chart(document.getElementById('cropChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Apr','May','Jun','Jul','Aug','Sep'],
+      datasets: [
+        { label: 'Wheat', data: [200,280,220,350,400,850], backgroundColor: 'rgba(27,94,32,0.7)' },
+        { label: 'Rice', data: [100,120,80,150,200,350], backgroundColor: 'rgba(0,191,165,0.7)' }
+      ]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'top' } } }
+  });
+</script>
+<script src="js/dashboard.js?v=3"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

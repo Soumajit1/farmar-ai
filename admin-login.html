@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgriLink AI — Admin Portal</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  .admin-login-page {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #eafbe7, #d4f1c5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Admin-specific background pattern */
+  .admin-login-page::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(var(--color-primary-light) 1px, transparent 1px);
+    background-size: 30px 30px;
+    opacity: 0.1;
+  }
+
+  .login-card-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 0 24px;
+    z-index: 1;
+  }
+
+  .admin-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: var(--shadow-lg);
+    padding: 40px 32px;
+    border-radius: var(--border-radius-md);
+  }
+
+  .admin-title {
+    font-size: 24px;
+    font-family: 'Outfit', sans-serif;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-secondary);
+    font-weight: 700;
+  }
+
+  .back-link {
+    position: absolute;
+    top: 24px;
+    left: 40px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 2;
+  }
+  
+  .back-link:hover {
+    color: var(--color-primary);
+  }
+</style>
+</head>
+<body>
+
+  <div class="admin-login-page">
+    
+    <a href="index.html" class="back-link">
+      <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Back to Main Portal
+    </a>
+
+    <div class="login-card-container fade-in">
+      <div class="admin-card card-3d">
+        <div class="admin-title">
+          <i data-lucide="shield-check" style="color: var(--color-primary); width: 28px; height: 28px;"></i> Admin Portal
+        </div>
+        
+        <p style="color: var(--text-muted); margin-bottom: 32px; font-size: 14px;">Secure access for system administrators only.</p>
+
+        <form id="adminLoginForm">
+          <div class="input-group">
+            <label for="adminId">Admin ID</label>
+            <input type="text" id="adminId" placeholder="Enter Admin ID" required>
+          </div>
+
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password" required>
+          </div>
+
+          <p class="error-msg" id="errorMsg" style="margin-bottom: 16px;"></p>
+
+          <button type="submit" class="btn-primary" style="width: 100%;">
+            <i data-lucide="lock" style="width: 16px; height: 16px;"></i> Authenticate
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    const form = document.getElementById('adminLoginForm');
+    const errorMsg = document.getElementById('errorMsg');
+    const submitBtn = form.querySelector('button');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const adminId = document.getElementById('adminId').value;
+      const password = document.getElementById('password').value;
+
+      if (!adminId || !password) {
+        errorMsg.textContent = 'Please fill all fields.';
+        return;
+      }
+
+      submitBtn.innerHTML = '<i data-lucide="loader" class="animate-spin" style="width: 16px; height: 16px;"></i> Authenticating...';
+      lucide.createIcons();
+      submitBtn.style.opacity = '0.8';
+      submitBtn.disabled = true;
+
+      // Mock auth
+      setTimeout(() => {
+        localStorage.setItem('agrilink_role', 'admin');
+        localStorage.setItem('agrilink_user', 'System Admin');
+        window.location.href = 'dashboard-admin.html';
+      }, 800);
+    });
+  </script>
+</body>
+</html>

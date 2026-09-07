@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FPO Dashboard — AgriLink AI</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="dashboard-layout">
+  
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><i data-lucide="tractor"></i> AgriLink AI</div>
+    </div>
+    
+    <nav class="nav-menu">
+      <a href="dashboard-fpo.html" class="nav-item active">FPO Overview</a>
+      <a href="fpo-members.html" class="nav-item">Member Farmers</a>
+      <a href="fpo-inventory.html" class="nav-item">Aggregated Produce</a>
+      <a href="fpo-buyers.html" class="nav-item">Buyer Connections</a>
+      <a href="fpo-transactions.html" class="nav-item">Transactions</a>
+      <a href="fpo-analytics.html" class="nav-item">Analytics</a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <a href="index.html" class="nav-item" style="color: #e74c3c; padding: 0;">Log Out</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <header class="topbar glass-panel">
+      <h2 class="page-title">FPO Overview</h2>
+      <div class="topbar-actions">
+        <button class="btn-secondary" style="padding: 8px 12px; display:flex; align-items:center;"><i data-lucide="bell" style="width:16px;height:16px;"></i></button>
+        <div class="user-profile">
+          <div class="avatar" id="userAvatar">O</div>
+          <span id="userName" style="font-weight: 500;">FPO Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard-container fade-in">
+      
+      <!-- FPO Overview Tab -->
+      <div id="tab-fpo-overview" class="tab-pane active">
+        <!-- Stat Cards -->
+      <div class="grid-cards">
+        <div class="card-3d stat-card">
+          <div class="stat-header">
+            <span>Total Members</span>
+            <span class="trend-up">+12 This Month</span>
+          </div>
+          <div class="stat-value">245</div>
+        </div>
+        
+        <div class="card-3d stat-card">
+          <div class="stat-header">
+            <span>Aggregated Volume</span>
+            <span class="trend-up">↑ 15%</span>
+          </div>
+          <div class="stat-value">1,200 <span style="font-size: 16px; color: var(--text-muted);">Qtl</span></div>
+        </div>
+
+        <div class="card-3d stat-card">
+          <div class="stat-header">
+            <span>Active Buyer Contracts</span>
+            <span style="color: var(--color-primary);">Stable</span>
+          </div>
+          <div class="stat-value">15</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+        <!-- Analytics Chart -->
+        <div class="dashboard-section card-3d" style="flex: 2; min-width: 300px;">
+          <div class="section-title">Aggregated Sales vs Volume</div>
+          <canvas id="salesChart" height="200"></canvas>
+        </div>
+
+        <!-- Recent Member Activities -->
+        <div class="dashboard-section card-3d" style="flex: 1; min-width: 250px;">
+          <div class="section-title">Recent Member Deposits</div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            
+            <div style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #eee;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="avatar" style="width: 32px; height: 32px; font-size: 14px;">A</div>
+                <div>
+                  <div style="font-weight: 600; font-size: 14px;">Anil Sharma</div>
+                  <div style="font-size: 12px; color: var(--text-muted);">Wheat • 2 hrs ago</div>
+                </div>
+              </div>
+              <div style="font-weight: 600;">+20 Qtl</div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #eee;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="avatar" style="width: 32px; height: 32px; font-size: 14px; background: #9b59b6;">M</div>
+                <div>
+                  <div style="font-weight: 600; font-size: 14px;">Mukesh Singh</div>
+                  <div style="font-size: 12px; color: var(--text-muted);">Rice • 5 hrs ago</div>
+                </div>
+              </div>
+              <div style="font-weight: 600;">+15 Qtl</div>
+            </div>
+
+            <button class="btn-secondary" style="width: 100%; margin-top: 8px;">View All Members</button>
+          </div>
+        </div>
+      </div>
+      <!-- End FPO Overview Tab -->
+
+      <!-- Member Farmers Tab -->
+      <div id="tab-member-farmers" class="tab-pane">
+        <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
+          <h3 class="section-title" style="margin-bottom:0;">Member Directory</h3>
+          <button class="btn-primary">+ Add Member</button>
+        </div>
+        <div class="dashboard-section glass-panel">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Land Size</th>
+                <th>Primary Crop</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Anil Sharma</td>
+                <td>Asansol</td>
+                <td>5 Acres</td>
+                <td>Wheat</td>
+                <td><span class="badge badge-success">Active</span></td>
+              </tr>
+              <tr>
+                <td>Mukesh Singh</td>
+                <td>Durgapur</td>
+                <td>3 Acres</td>
+                <td>Rice</td>
+                <td><span class="badge badge-success">Active</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Aggregated Produce Tab -->
+      <div id="tab-aggregated-produce" class="tab-pane">
+        <div class="dashboard-section glass-panel">
+          <div class="section-title">Pooled Inventory</div>
+          <div class="grid-cards">
+            <div class="card-3d" style="padding:20px;">
+              <h3 style="margin-bottom:8px;">Wheat (Grade A)</h3>
+              <p style="font-size:24px; font-weight:700; color:var(--color-primary); margin-bottom:12px;">850 <span style="font-size:14px; color:var(--text-muted); font-weight:400;">Qtl</span></p>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-primary" style="flex:1; font-size:13px; padding:8px;">Find Buyers</button>
+              </div>
+            </div>
+            <div class="card-3d" style="padding:20px;">
+              <h3 style="margin-bottom:8px;">Rice (Basmati)</h3>
+              <p style="font-size:24px; font-weight:700; color:var(--color-primary); margin-bottom:12px;">350 <span style="font-size:14px; color:var(--text-muted); font-weight:400;">Qtl</span></p>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-primary" style="flex:1; font-size:13px; padding:8px;">Find Buyers</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buyer Connections Tab -->
+      <div id="tab-buyer-connections" class="tab-pane">
+        <div class="dashboard-section glass-panel">
+          <div class="section-title">Enterprise Buyers CRM</div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Contact Person</th>
+                <th>Frequent Purchases</th>
+                <th>Contract Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>AgriCorp Foods</td>
+                <td>Rajiv Mehta</td>
+                <td>Wheat, Potatoes</td>
+                <td><span class="badge badge-success">Active Contract</span></td>
+              </tr>
+              <tr>
+                <td>Fresh Foods Ltd</td>
+                <td>Sunil Verma</td>
+                <td>Vegetables</td>
+                <td><span class="badge badge-warning">Negotiating</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Transactions Tab -->
+      <div id="tab-transactions" class="tab-pane">
+        <div class="dashboard-section glass-panel">
+          <div class="section-title">FPO Ledger</div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Txn ID</th>
+                <th>Date</th>
+                <th>Counterparty</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>LED-1092</td>
+                <td>2026-08-10</td>
+                <td>AgriCorp Foods</td>
+                <td><span class="badge" style="background:#e8f5e9; color:#2e7d32;">Inbound (Sale)</span></td>
+                <td>₹12,50,000</td>
+                <td><span class="badge badge-success">Cleared</span></td>
+              </tr>
+              <tr>
+                <td>LED-1093</td>
+                <td>2026-08-12</td>
+                <td>Anil Sharma (Member)</td>
+                <td><span class="badge" style="background:#ffebee; color:#c62828;">Outbound (Payout)</span></td>
+                <td>₹45,200</td>
+                <td><span class="badge badge-success">Cleared</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Analytics Tab -->
+      <div id="tab-analytics" class="tab-pane">
+        <div class="dashboard-section glass-panel">
+          <div class="section-title">Deep Analytics</div>
+          <div style="height: 300px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); background:rgba(0,0,0,0.02); border-radius:8px;">
+            Detailed Chart Visualizations Loading...
+          </div>
+        </div>
+      </div>
+
+      <!-- Fallback Tab -->
+      <div id="tab-under-dev" class="tab-pane">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; color: var(--text-muted); text-align: center;" class="fade-in">
+            <i data-lucide="hammer" style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+            <h2 id="dev-title" style="font-family: 'Outfit', sans-serif; color: var(--text-main); margin-bottom: 8px;">Module</h2>
+            <p>This module is currently under development for the next phase.</p>
+            <button class="btn-secondary" style="margin-top: 24px;" onclick="window.location.reload()">Back to Overview</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  const user = localStorage.getItem('agrilink_user') || 'FPO Admin';
+  document.getElementById('userName').textContent = user;
+  document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
+
+  // Chart.js
+  const ctx = document.getElementById('salesChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [
+        {
+          label: 'Sales (₹ Lakhs)',
+          data: [12, 19, 15, 25, 22, 30],
+          backgroundColor: 'rgba(27, 94, 32, 0.8)',
+          borderRadius: 4
+        },
+        {
+          label: 'Volume (100x Qtl)',
+          data: [15, 22, 20, 30, 28, 35],
+          backgroundColor: 'rgba(0, 191, 165, 0.6)',
+          borderRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+</script>
+<script src="js/dashboard.js?v=2"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

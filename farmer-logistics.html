@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logistics — AgriLink AI</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  .shipment-card { background:white; border:1px solid #eee; border-radius:12px; padding:24px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+  .progress-track { height:6px; background:#e8f5e9; border-radius:3px; position:relative; margin:28px 0 8px; }
+  .progress-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--color-primary),var(--color-accent)); }
+  .progress-dots { display:flex; justify-content:space-between; position:absolute; top:-8px; width:100%; }
+  .progress-dot { width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow:0 0 0 2px var(--color-primary); background:var(--color-primary); }
+  .progress-dot.inactive { background:white; box-shadow:0 0 0 2px #ccc; }
+  .progress-labels { display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><i data-lucide="tractor"></i> AgriLink AI</div>
+    </div>
+    <nav class="nav-menu">
+      <a href="dashboard-farmer.html" class="nav-item">Overview</a>
+      <a href="farmer-market-prices.html" class="nav-item">Market Prices</a>
+      <a href="farmer-produce.html" class="nav-item">My Produce</a>
+      <a href="farmer-offers.html" class="nav-item">Buyer Offers</a>
+      <a href="farmer-transactions.html" class="nav-item">Transactions</a>
+      <a href="farmer-logistics.html" class="nav-item active">Logistics</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="index.html" class="nav-item" style="color:#e74c3c;padding:0;">Log Out</a>
+    </div>
+  </aside>
+  <main class="main-content">
+    <header class="topbar glass-panel">
+      <h2 class="page-title">Logistics</h2>
+      <div class="topbar-actions">
+        <button id="notifBtn" class="btn-secondary" style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><i data-lucide="bell" style="width:16px;height:16px;"></i> Notifications</button>
+        <div class="user-profile">
+          <div class="avatar" id="userAvatar">F</div>
+          <span id="userName" style="font-weight:500;">Farmer</span>
+        </div>
+      </div>
+    </header>
+    <div class="dashboard-container fade-in">
+
+      <h3 style="font-family:'Outfit',sans-serif;margin-bottom:16px;">Active Shipments</h3>
+
+      <div class="shipment-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <h3 style="margin-bottom:4px;">Shipment #SHP-882</h3>
+            <p style="font-size:13px;color:var(--text-muted);">Wheat (100 Qtl) → AgriCorp Foods, Bardhaman</p>
+          </div>
+          <span class="badge badge-warning">In Transit</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:60%;"></div>
+          <div class="progress-dots">
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot inactive"></div>
+          </div>
+        </div>
+        <div class="progress-labels" style="margin-top:6px;">
+          <span>Dispatched<br><strong>4 Sep</strong></span>
+          <span style="text-align:center;">In Transit<br><strong>Today</strong></span>
+          <span style="text-align:right;">Delivery<br><strong>6 Sep</strong></span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid #eee;">
+          <div><p style="font-size:12px;color:var(--text-muted);">Driver</p><p style="font-weight:600;">Rakesh Yadav</p></div>
+          <div><p style="font-size:12px;color:var(--text-muted);">Vehicle</p><p style="font-weight:600;">WB-23 AB 4567</p></div>
+          <div><p style="font-size:12px;color:var(--text-muted);">Contact</p><p style="font-weight:600;">+91 98765 43210</p></div>
+        </div>
+      </div>
+
+      <div class="shipment-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <h3 style="margin-bottom:4px;">Shipment #SHP-890</h3>
+            <p style="font-size:13px;color:var(--text-muted);">Basmati Rice (30 Qtl) → Green Mart Pvt Ltd, Kolkata</p>
+          </div>
+          <span class="badge" style="background:#e3f2fd;color:#1565c0;">Dispatched</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:20%;"></div>
+          <div class="progress-dots">
+            <div class="progress-dot"></div>
+            <div class="progress-dot inactive"></div>
+            <div class="progress-dot inactive"></div>
+          </div>
+        </div>
+        <div class="progress-labels" style="margin-top:6px;">
+          <span>Dispatched<br><strong>Today</strong></span>
+          <span style="text-align:center;">In Transit<br><strong>—</strong></span>
+          <span style="text-align:right;">Delivery<br><strong>7 Sep</strong></span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid #eee;">
+          <div><p style="font-size:12px;color:var(--text-muted);">Driver</p><p style="font-weight:600;">Suresh Patel</p></div>
+          <div><p style="font-size:12px;color:var(--text-muted);">Vehicle</p><p style="font-weight:600;">WB-12 CD 7891</p></div>
+          <div><p style="font-size:12px;color:var(--text-muted);">Contact</p><p style="font-weight:600;">+91 91234 56789</p></div>
+        </div>
+      </div>
+
+      <h3 style="font-family:'Outfit',sans-serif;margin:24px 0 16px;">Past Deliveries</h3>
+      <div class="dashboard-section glass-panel">
+        <table class="data-table">
+          <thead>
+            <tr><th>Shipment ID</th><th>Buyer</th><th>Produce</th><th>Dispatched</th><th>Delivered</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SHP-840</td><td>Fresh Foods Ltd</td><td>Wheat (50 Qtl)</td><td>20 Aug</td><td>22 Aug</td>
+              <td><span class="badge badge-success">Delivered</span></td>
+            </tr>
+            <tr>
+              <td>SHP-821</td><td>AgriCorp Foods</td><td>Potatoes (80 Qtl)</td><td>5 Aug</td><td>7 Aug</td>
+              <td><span class="badge badge-success">Delivered</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  const user = localStorage.getItem('agrilink_user') || 'Farmer';
+  document.getElementById('userName').textContent = user;
+  document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
+</script>
+<script src="js/dashboard.js?v=3"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
