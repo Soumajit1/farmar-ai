@@ -1,0 +1,2033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Produce — AgriLink AI</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+  .produce-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .produce-toolbar-left h2 {
+    font-family: 'Outfit', sans-serif;
+    margin-bottom: 4px;
+  }
+
+  .produce-toolbar-left p {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .produce-toolbar-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .search-input {
+    padding: 11px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    min-width: 220px;
+    outline: none;
+  }
+
+  .search-input:focus {
+    border-color: var(--color-primary);
+  }
+
+  .filter-select {
+    padding: 11px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    outline: none;
+  }
+
+  .produce-card {
+    padding: 24px;
+  }
+
+  .produce-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .produce-card-header h3 {
+    color: var(--text-main);
+    margin-bottom: 5px;
+  }
+
+  .produce-date {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .produce-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .produce-info-box {
+    background: #f8fffe;
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .produce-info-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .produce-info-value {
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .produce-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .produce-actions button {
+    flex: 1;
+  }
+
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+
+  .empty-state i {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+  }
+
+  .loading-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 50px;
+    color: var(--text-muted);
+  }
+
+  .error-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px;
+    color: #e74c3c;
+  }
+
+  .status-available {
+    background: #dff5e7;
+    color: #16833c;
+  }
+
+  .status-pending {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  .status-sold {
+    background: #eee;
+    color: #666;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  .produce-modal {
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .modal-header h2 {
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .close-modal {
+    border: none;
+    background: transparent;
+    font-size: 25px;
+    cursor: pointer;
+    color: #666;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .modal-form .input-group {
+    margin-bottom: 16px;
+  }
+
+  .modal-form label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .modal-form input,
+  .modal-form select,
+  .modal-form textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    font-family: inherit;
+  }
+
+  .modal-form textarea {
+    min-height: 90px;
+    resize: vertical;
+  }
+
+  .modal-form input:focus,
+  .modal-form select:focus,
+  .modal-form textarea:focus {
+    border-color: var(--color-primary);
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .form-error {
+    color: #e74c3c;
+    font-size: 13px;
+    margin-top: 5px;
+    min-height: 18px;
+  }
+
+  .success-message {
+    background: #e7f8ed;
+    color: #16833c;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    display: none;
+    font-size: 14px;
+  }
+
+  .danger-button {
+    border-color: #e74c3c !important;
+    color: #e74c3c !important;
+  }
+
+  .danger-button:hover {
+    background: #fff5f5;
+  }
+
+  @media (max-width: 600px) {
+    .produce-info,
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .produce-toolbar-right {
+      width: 100%;
+    }
+
+    .search-input {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .filter-select {
+      width: 100%;
+    }
+
+    .produce-toolbar-right .btn-primary {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <i data-lucide="tractor"></i>
+        AgriLink AI
+      </div>
+    </div>
+
+    <nav class="nav-menu">
+
+      <a href="dashboard-farmer.html" class="nav-item">
+        Overview
+      </a>
+
+      <a href="farmer-market-prices.html" class="nav-item">
+        Market Prices
+      </a>
+
+      <a href="farmer-produce.html" class="nav-item active">
+        My Produce
+      </a>
+
+      <a href="farmer-offers.html" class="nav-item">
+        Buyer Offers
+      </a>
+
+      <a href="farmer-transactions.html" class="nav-item">
+        Transactions
+      </a>
+
+      <a href="farmer-logistics.html" class="nav-item">
+        Logistics
+      </a>
+
+    </nav>
+
+    <div class="sidebar-footer">
+
+      <a
+        href="index.html"
+        id="logoutBtn"
+        class="nav-item"
+        style="color:#e74c3c;padding:0;"
+      >
+        Log Out
+      </a>
+
+    </div>
+
+  </aside>
+
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar glass-panel">
+
+      <h2 class="page-title">
+        My Produce
+      </h2>
+
+      <div class="topbar-actions">
+
+        <button
+          id="notifBtn"
+          class="btn-secondary"
+          style="padding:8px 12px;display:flex;align-items:center;gap:8px;"
+        >
+          <i
+            data-lucide="bell"
+            style="width:16px;height:16px;"
+          ></i>
+
+          Notifications
+        </button>
+
+        <div class="user-profile">
+
+          <div
+            class="avatar"
+            id="userAvatar"
+          >
+            F
+          </div>
+
+          <span
+            id="userName"
+            style="font-weight:500;"
+          >
+            Farmer
+          </span>
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- DASHBOARD -->
+    <div class="dashboard-container fade-in">
+
+      <!-- TOOLBAR -->
+      <div class="produce-toolbar">
+
+        <div class="produce-toolbar-left">
+
+          <h2>
+            Inventory Management
+          </h2>
+
+          <p>
+            Manage your produce listings and inventory.
+          </p>
+
+        </div>
+
+
+        <div class="produce-toolbar-right">
+
+          <input
+            type="text"
+            id="searchProduce"
+            class="search-input"
+            placeholder="Search produce..."
+          >
+
+          <select
+            id="statusFilter"
+            class="filter-select"
+          >
+            <option value="all">
+              All Status
+            </option>
+
+            <option value="available">
+              Available
+            </option>
+
+            <option value="pending">
+              Pending
+            </option>
+
+            <option value="sold">
+              Sold
+            </option>
+          </select>
+
+          <button
+            id="addProduceBtn"
+            class="btn-primary"
+          >
+            + Add New Produce
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- SUCCESS MESSAGE -->
+      <div
+        id="successMessage"
+        class="success-message"
+      ></div>
+
+
+      <!-- PRODUCE CARDS -->
+      <div
+        id="produceContainer"
+        class="grid-cards"
+      >
+
+        <div class="loading-state">
+          Loading your produce...
+        </div>
+
+      </div>
+
+
+      <!-- PENDING VERIFICATION -->
+      <div
+        class="dashboard-section glass-panel"
+        style="margin-top:32px;"
+      >
+
+        <div class="section-title">
+          Pending Verification
+        </div>
+
+        <table class="data-table">
+
+          <thead>
+
+            <tr>
+              <th>Produce</th>
+              <th>Quantity</th>
+              <th>Submitted On</th>
+              <th>Status</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="pendingTableBody">
+
+            <tr>
+              <td colspan="4" style="text-align:center;">
+                No pending produce
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<!-- ==========================================
+     ADD / EDIT MODAL
+========================================== -->
+
+<div
+  id="produceModal"
+  class="modal-overlay"
+>
+
+  <div class="produce-modal">
+
+    <div class="modal-header">
+
+      <h2 id="modalTitle">
+        Add New Produce
+      </h2>
+
+      <button
+        type="button"
+        class="close-modal"
+        id="closeModalBtn"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <form
+      id="produceForm"
+      class="modal-form"
+    >
+
+      <input
+        type="hidden"
+        id="produceId"
+      >
+
+
+      <!-- CROP -->
+      <div class="input-group">
+
+        <label for="cropName">
+          Crop Name
+        </label>
+
+        <input
+          type="text"
+          id="cropName"
+          placeholder="e.g. Wheat"
+          maxlength="100"
+          required
+        >
+
+      </div>
+
+
+      <!-- QUANTITY + UNIT -->
+      <div class="form-row">
+
+        <div class="input-group">
+
+          <label for="quantity">
+            Quantity
+          </label>
+
+          <input
+            type="number"
+            id="quantity"
+            placeholder="e.g. 50"
+            min="0.01"
+            step="0.01"
+            required
+          >
+
+        </div>
+
+
+        <div class="input-group">
+
+          <label for="unit">
+            Unit
+          </label>
+
+          <select id="unit">
+
+            <option value="kg">
+              Kilogram (kg)
+            </option>
+
+            <option value="quintal">
+              Quintal
+            </option>
+
+            <option value="ton">
+              Ton
+            </option>
+
+            <option value="litre">
+              Litre
+            </option>
+
+            <option value="piece">
+              Piece
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <!-- PRICE + QUALITY -->
+      <div class="form-row">
+
+        <div class="input-group">
+
+          <label for="pricePerUnit">
+            Asking Price / Unit
+          </label>
+
+          <input
+            type="number"
+            id="pricePerUnit"
+            placeholder="e.g. 2200"
+            min="0"
+            step="0.01"
+          >
+
+        </div>
+
+
+        <div class="input-group">
+
+          <label for="quality">
+            Quality / Grade
+          </label>
+
+          <input
+            type="text"
+            id="quality"
+            placeholder="e.g. Grade A"
+            maxlength="50"
+          >
+
+        </div>
+
+      </div>
+
+
+      <!-- STATUS -->
+      <div class="input-group">
+
+        <label for="produceStatus">
+          Status
+        </label>
+
+        <select id="produceStatus">
+
+          <option value="available">
+            Available
+          </option>
+
+          <option value="pending">
+            Pending
+          </option>
+
+          <option value="sold">
+            Sold
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- DESCRIPTION -->
+      <div class="input-group">
+
+        <label for="description">
+          Description
+        </label>
+
+        <textarea
+          id="description"
+          placeholder="Add details about your produce..."
+        ></textarea>
+
+      </div>
+
+
+      <div
+        id="formError"
+        class="form-error"
+      ></div>
+
+
+      <!-- FOOTER -->
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          id="cancelModalBtn"
+          class="btn-secondary"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          id="saveProduceBtn"
+          class="btn-primary"
+        >
+          Save Produce
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- DASHBOARD JS -->
+<script src="js/dashboard.js?v=3"></script>
+
+
+<script>
+/*
+==================================================
+AGRILINK AI
+FARMER PRODUCE MANAGEMENT
+==================================================
+*/
+
+const API_BASE =
+  "http://localhost:5000";
+
+const farmerId =
+  localStorage.getItem("agrilink_user_id");
+
+const farmerRole =
+  localStorage.getItem("agrilink_role");
+
+const farmerName =
+  localStorage.getItem("agrilink_user") || "Farmer";
+
+
+/*
+==================================================
+ELEMENTS
+==================================================
+*/
+
+const produceContainer =
+  document.getElementById(
+    "produceContainer"
+  );
+
+const pendingTableBody =
+  document.getElementById(
+    "pendingTableBody"
+  );
+
+const searchProduce =
+  document.getElementById(
+    "searchProduce"
+  );
+
+const statusFilter =
+  document.getElementById(
+    "statusFilter"
+  );
+
+const addProduceBtn =
+  document.getElementById(
+    "addProduceBtn"
+  );
+
+const produceModal =
+  document.getElementById(
+    "produceModal"
+  );
+
+const produceForm =
+  document.getElementById(
+    "produceForm"
+  );
+
+const closeModalBtn =
+  document.getElementById(
+    "closeModalBtn"
+  );
+
+const cancelModalBtn =
+  document.getElementById(
+    "cancelModalBtn"
+  );
+
+const modalTitle =
+  document.getElementById(
+    "modalTitle"
+  );
+
+const produceId =
+  document.getElementById(
+    "produceId"
+  );
+
+const cropName =
+  document.getElementById(
+    "cropName"
+  );
+
+const quantity =
+  document.getElementById(
+    "quantity"
+  );
+
+const unit =
+  document.getElementById(
+    "unit"
+  );
+
+const pricePerUnit =
+  document.getElementById(
+    "pricePerUnit"
+  );
+
+const quality =
+  document.getElementById(
+    "quality"
+  );
+
+const produceStatus =
+  document.getElementById(
+    "produceStatus"
+  );
+
+const description =
+  document.getElementById(
+    "description"
+  );
+
+const formError =
+  document.getElementById(
+    "formError"
+  );
+
+const saveProduceBtn =
+  document.getElementById(
+    "saveProduceBtn"
+  );
+
+const successMessage =
+  document.getElementById(
+    "successMessage"
+  );
+
+
+/*
+==================================================
+USER DISPLAY
+==================================================
+*/
+
+document.getElementById(
+  "userName"
+).textContent = farmerName;
+
+document.getElementById(
+  "userAvatar"
+).textContent =
+  farmerName
+    .charAt(0)
+    .toUpperCase();
+
+
+/*
+==================================================
+LOCAL DATA
+==================================================
+*/
+
+let allProduce = [];
+
+
+/*
+==================================================
+CHECK LOGIN
+==================================================
+*/
+
+if (
+  !farmerId ||
+  farmerRole !== "farmer"
+) {
+
+  alert(
+    "Farmer login is required."
+  );
+
+  window.location.href =
+    "index.html";
+}
+
+
+/*
+==================================================
+LOAD PRODUCE
+==================================================
+*/
+
+async function loadProduce() {
+
+  produceContainer.innerHTML = `
+    <div class="loading-state">
+      Loading your produce...
+    </div>
+  `;
+
+  try {
+
+    const response =
+      await fetch(
+        `${API_BASE}/api/farmer/produce/${farmerId}`
+      );
+
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.message ||
+        "Failed to load produce."
+      );
+
+    }
+
+    allProduce =
+      Array.isArray(data.produce)
+        ? data.produce
+        : [];
+
+    renderProduce();
+
+    renderPendingProduce();
+
+  } catch (error) {
+
+    console.error(
+      "Load produce error:",
+      error
+    );
+
+    produceContainer.innerHTML = `
+      <div class="error-state">
+        <i data-lucide="circle-alert"></i>
+        <p>
+          ${escapeHtml(error.message)}
+        </p>
+
+        <button
+          class="btn-secondary"
+          onclick="loadProduce()"
+          style="margin-top:12px;"
+        >
+          Try Again
+        </button>
+      </div>
+    `;
+
+    lucide.createIcons();
+
+  }
+
+}
+
+
+/*
+==================================================
+RENDER PRODUCE
+==================================================
+*/
+
+function renderProduce() {
+
+  const search =
+    searchProduce.value
+      .trim()
+      .toLowerCase();
+
+  const selectedStatus =
+    statusFilter.value;
+
+  const filtered =
+    allProduce.filter(item => {
+
+      const crop =
+        String(
+          item.crop_name || ""
+        ).toLowerCase();
+
+      const qualityValue =
+        String(
+          item.quality || ""
+        ).toLowerCase();
+
+      const matchesSearch =
+        !search ||
+        crop.includes(search) ||
+        qualityValue.includes(search);
+
+      const matchesStatus =
+        selectedStatus === "all" ||
+        item.status === selectedStatus;
+
+      return (
+        matchesSearch &&
+        matchesStatus
+      );
+
+    });
+
+
+  if (filtered.length === 0) {
+
+    produceContainer.innerHTML = `
+      <div class="empty-state">
+
+        <i data-lucide="wheat"></i>
+
+        <h3>
+          No produce found
+        </h3>
+
+        <p>
+          Add your first produce listing to start selling.
+        </p>
+
+        <button
+          class="btn-primary"
+          onclick="openAddModal()"
+          style="margin-top:15px;"
+        >
+          + Add New Produce
+        </button>
+
+      </div>
+    `;
+
+    lucide.createIcons();
+
+    return;
+  }
+
+
+  produceContainer.innerHTML =
+    filtered
+      .map(
+        createProduceCard
+      )
+      .join("");
+
+  lucide.createIcons();
+
+}
+
+
+/*
+==================================================
+PRODUCE CARD
+==================================================
+*/
+
+function createProduceCard(
+  item
+) {
+
+  const id =
+    Number(item.id);
+
+  const crop =
+    escapeHtml(
+      item.crop_name || "Unknown Crop"
+    );
+
+  const itemQuantity =
+    Number(
+      item.quantity || 0
+    ).toLocaleString(
+      "en-IN",
+      {
+        maximumFractionDigits: 2
+      }
+    );
+
+  const itemUnit =
+    escapeHtml(
+      item.unit || "kg"
+    );
+
+  const price =
+    item.price_per_unit !== null &&
+    item.price_per_unit !== undefined &&
+    item.price_per_unit !== ""
+      ? `₹${Number(
+          item.price_per_unit
+        ).toLocaleString(
+          "en-IN",
+          {
+            maximumFractionDigits: 2
+          }
+        )}`
+      : "Not set";
+
+  const qualityText =
+    item.quality
+      ? escapeHtml(item.quality)
+      : "Not specified";
+
+  const status =
+    item.status || "available";
+
+  const statusText =
+    status.charAt(0).toUpperCase() +
+    status.slice(1);
+
+  const date =
+    item.created_at
+      ? new Date(
+          item.created_at
+        ).toLocaleDateString(
+          "en-IN",
+          {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          }
+        )
+      : "—";
+
+
+  return `
+    <div
+      class="card-3d produce-card"
+      data-produce-id="${id}"
+    >
+
+      <div class="produce-card-header">
+
+        <div>
+
+          <h3>
+            ${crop}
+          </h3>
+
+          <p class="produce-date">
+            Added: ${date}
+          </p>
+
+        </div>
+
+        <span
+          class="badge status-${status}"
+        >
+          ${statusText}
+        </span>
+
+      </div>
+
+
+      <div class="produce-info">
+
+        <div class="produce-info-box">
+
+          <div class="produce-info-label">
+            Quantity
+          </div>
+
+          <div class="produce-info-value">
+            ${itemQuantity}
+            ${itemUnit}
+          </div>
+
+        </div>
+
+
+        <div class="produce-info-box">
+
+          <div class="produce-info-label">
+            Asking Price
+          </div>
+
+          <div
+            class="produce-info-value"
+            style="color:var(--color-primary);"
+          >
+            ${price}
+          </div>
+
+        </div>
+
+
+        <div class="produce-info-box">
+
+          <div class="produce-info-label">
+            Quality
+          </div>
+
+          <div class="produce-info-value">
+            ${qualityText}
+          </div>
+
+        </div>
+
+
+        <div class="produce-info-box">
+
+          <div class="produce-info-label">
+            Listing ID
+          </div>
+
+          <div class="produce-info-value">
+            #${id}
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="produce-actions">
+
+        ${
+          status !== "sold"
+            ? `
+              <button
+                class="btn-secondary"
+                onclick="openEditModal(${id})"
+              >
+                Edit
+              </button>
+            `
+            : ""
+        }
+
+
+        ${
+          status !== "sold"
+            ? `
+              <button
+                class="btn-secondary danger-button"
+                onclick="deleteProduce(${id})"
+              >
+                Remove
+              </button>
+            `
+            : ""
+        }
+
+      </div>
+
+    </div>
+  `;
+
+}
+
+
+/*
+==================================================
+PENDING PRODUCE TABLE
+==================================================
+*/
+
+function renderPendingProduce() {
+
+  const pending =
+    allProduce.filter(
+      item =>
+        item.status === "pending"
+    );
+
+
+  if (pending.length === 0) {
+
+    pendingTableBody.innerHTML = `
+      <tr>
+        <td
+          colspan="4"
+          style="text-align:center;color:var(--text-muted);"
+        >
+          No pending produce
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+
+  pendingTableBody.innerHTML =
+    pending
+      .map(item => {
+
+        const date =
+          item.created_at
+            ? new Date(
+                item.created_at
+              ).toLocaleDateString(
+                "en-IN",
+                {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric"
+                }
+              )
+            : "—";
+
+
+        return `
+          <tr>
+
+            <td>
+              ${escapeHtml(
+                item.crop_name
+              )}
+            </td>
+
+            <td>
+              ${Number(
+                item.quantity
+              ).toLocaleString(
+                "en-IN",
+                {
+                  maximumFractionDigits: 2
+                }
+              )}
+              ${escapeHtml(
+                item.unit || "kg"
+              )}
+            </td>
+
+            <td>
+              ${date}
+            </td>
+
+            <td>
+              <span class="badge badge-warning">
+                Pending
+              </span>
+            </td>
+
+          </tr>
+        `;
+
+      })
+      .join("");
+
+}
+
+
+/*
+==================================================
+OPEN ADD MODAL
+==================================================
+*/
+
+function openAddModal() {
+
+  produceForm.reset();
+
+  produceId.value = "";
+
+  modalTitle.textContent =
+    "Add New Produce";
+
+  saveProduceBtn.textContent =
+    "Add Produce";
+
+  formError.textContent = "";
+
+  produceModal.classList.add(
+    "active"
+  );
+
+  cropName.focus();
+
+}
+
+
+/*
+==================================================
+OPEN EDIT MODAL
+==================================================
+*/
+
+function openEditModal(
+  id
+) {
+
+  const item =
+    allProduce.find(
+      produce =>
+        Number(produce.id) === Number(id)
+    );
+
+
+  if (!item) {
+
+    alert(
+      "Produce listing not found."
+    );
+
+    return;
+  }
+
+
+  if (item.status === "sold") {
+
+    alert(
+      "Sold produce cannot be edited."
+    );
+
+    return;
+  }
+
+
+  produceId.value =
+    item.id;
+
+  cropName.value =
+    item.crop_name || "";
+
+  quantity.value =
+    item.quantity || "";
+
+  unit.value =
+    item.unit || "kg";
+
+  pricePerUnit.value =
+    item.price_per_unit ?? "";
+
+  quality.value =
+    item.quality || "";
+
+  produceStatus.value =
+    item.status || "available";
+
+  description.value =
+    item.description || "";
+
+  modalTitle.textContent =
+    "Edit Produce";
+
+  saveProduceBtn.textContent =
+    "Update Produce";
+
+  formError.textContent = "";
+
+  produceModal.classList.add(
+    "active"
+  );
+
+  cropName.focus();
+
+}
+
+
+/*
+==================================================
+CLOSE MODAL
+==================================================
+*/
+
+function closeModal() {
+
+  produceModal.classList.remove(
+    "active"
+  );
+
+  produceForm.reset();
+
+  produceId.value = "";
+
+  formError.textContent = "";
+
+}
+
+
+/*
+==================================================
+SAVE PRODUCE
+==================================================
+*/
+
+produceForm.addEventListener(
+  "submit",
+  async function(event) {
+
+    event.preventDefault();
+
+    formError.textContent = "";
+
+    const crop =
+      cropName.value.trim();
+
+    const qty =
+      Number(quantity.value);
+
+    const selectedUnit =
+      unit.value;
+
+    const price =
+      pricePerUnit.value.trim();
+
+    const selectedQuality =
+      quality.value.trim();
+
+    const selectedStatus =
+      produceStatus.value;
+
+    const selectedDescription =
+      description.value.trim();
+
+
+    if (!crop) {
+
+      formError.textContent =
+        "Crop name is required.";
+
+      return;
+    }
+
+
+    if (!Number.isFinite(qty) || qty <= 0) {
+
+      formError.textContent =
+        "Quantity must be greater than 0.";
+
+      return;
+    }
+
+
+    const payload = {
+
+      farmerId:
+        Number(farmerId),
+
+      cropName:
+        crop,
+
+      quantity:
+        qty,
+
+      unit:
+        selectedUnit,
+
+      pricePerUnit:
+        price === ""
+          ? null
+          : Number(price),
+
+      quality:
+        selectedQuality || null,
+
+      description:
+        selectedDescription || null,
+
+      status:
+        selectedStatus
+
+    };
+
+
+    const editingId =
+      produceId.value;
+
+
+    const isEditing =
+      Boolean(editingId);
+
+
+    const url =
+      isEditing
+        ? `${API_BASE}/api/farmer/produce/${editingId}`
+        : `${API_BASE}/api/farmer/produce`;
+
+
+    const method =
+      isEditing
+        ? "PUT"
+        : "POST";
+
+
+    saveProduceBtn.disabled =
+      true;
+
+    saveProduceBtn.textContent =
+      isEditing
+        ? "Updating..."
+        : "Adding...";
+
+
+    try {
+
+      const response =
+        await fetch(
+          url,
+          {
+            method,
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body:
+              JSON.stringify(
+                payload
+              )
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.message ||
+          "Operation failed."
+        );
+
+      }
+
+
+      closeModal();
+
+
+      showSuccess(
+        isEditing
+          ? "Produce updated successfully."
+          : "Produce added successfully."
+      );
+
+
+      await loadProduce();
+
+
+    } catch (error) {
+
+      console.error(
+        "Save produce error:",
+        error
+      );
+
+      formError.textContent =
+        error.message ||
+        "Unable to save produce.";
+
+    } finally {
+
+      saveProduceBtn.disabled =
+        false;
+
+      saveProduceBtn.textContent =
+        isEditing
+          ? "Update Produce"
+          : "Add Produce";
+
+    }
+
+  }
+);
+
+
+/*
+==================================================
+DELETE PRODUCE
+==================================================
+*/
+
+async function deleteProduce(
+  id
+) {
+
+  const item =
+    allProduce.find(
+      produce =>
+        Number(produce.id) === Number(id)
+    );
+
+
+  if (!item) {
+    return;
+  }
+
+
+  if (item.status === "sold") {
+
+    alert(
+      "Sold produce cannot be deleted."
+    );
+
+    return;
+  }
+
+
+  const confirmed =
+    confirm(
+      `Remove "${item.crop_name}" from your produce listings?`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        `${API_BASE}/api/farmer/produce/${id}`,
+        {
+          method: "DELETE",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              farmerId:
+                Number(farmerId)
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.message ||
+        "Failed to delete produce."
+      );
+
+    }
+
+
+    showSuccess(
+      "Produce removed successfully."
+    );
+
+
+    await loadProduce();
+
+
+  } catch (error) {
+
+    console.error(
+      "Delete produce error:",
+      error
+    );
+
+    alert(
+      error.message ||
+      "Unable to delete produce."
+    );
+
+  }
+
+}
+
+
+/*
+==================================================
+SEARCH
+==================================================
+*/
+
+searchProduce.addEventListener(
+  "input",
+  renderProduce
+);
+
+
+/*
+==================================================
+FILTER
+==================================================
+*/
+
+statusFilter.addEventListener(
+  "change",
+  renderProduce
+);
+
+
+/*
+==================================================
+MODAL BUTTONS
+==================================================
+*/
+
+addProduceBtn.addEventListener(
+  "click",
+  openAddModal
+);
+
+closeModalBtn.addEventListener(
+  "click",
+  closeModal
+);
+
+cancelModalBtn.addEventListener(
+  "click",
+  closeModal
+);
+
+
+/*
+==================================================
+CLICK OUTSIDE MODAL
+==================================================
+*/
+
+produceModal.addEventListener(
+  "click",
+  function(event) {
+
+    if (
+      event.target ===
+      produceModal
+    ) {
+      closeModal();
+    }
+
+  }
+);
+
+
+/*
+==================================================
+ESCAPE KEY
+==================================================
+*/
+
+document.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (
+      event.key === "Escape" &&
+      produceModal.classList.contains(
+        "active"
+      )
+    ) {
+      closeModal();
+    }
+
+  }
+);
+
+
+/*
+==================================================
+SUCCESS MESSAGE
+==================================================
+*/
+
+function showSuccess(
+  message
+) {
+
+  successMessage.textContent =
+    message;
+
+  successMessage.style.display =
+    "block";
+
+
+  setTimeout(
+    function() {
+
+      successMessage.style.display =
+        "none";
+
+    },
+    3500
+  );
+
+}
+
+
+/*
+==================================================
+HTML ESCAPE
+==================================================
+*/
+
+function escapeHtml(
+  value
+) {
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/*
+==================================================
+LOGOUT
+==================================================
+*/
+
+document
+  .getElementById("logoutBtn")
+  .addEventListener(
+    "click",
+    function() {
+
+      localStorage.removeItem(
+        "agrilink_token"
+      );
+
+      localStorage.removeItem(
+        "agrilink_role"
+      );
+
+      localStorage.removeItem(
+        "agrilink_user"
+      );
+
+      localStorage.removeItem(
+        "agrilink_email"
+      );
+
+      localStorage.removeItem(
+        "agrilink_user_id"
+      );
+
+    }
+  );
+
+
+/*
+==================================================
+INITIAL LOAD
+==================================================
+*/
+
+loadProduce();
+
+
+/*
+==================================================
+LUCIDE ICONS
+==================================================
+*/
+
+lucide.createIcons();
+
+</script>
+
+</body>
+</html>

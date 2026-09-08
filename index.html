@@ -1,244 +1,899 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>AgriLink AI — Login</title>
+
 <link rel="stylesheet" href="css/style.css">
+
 <style>
-  /* Page specific styles for Login split screen */
+
+/* ==================================================
+   LOGIN PAGE
+================================================== */
+
+.login-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+
+/* ==================================================
+   VISUAL SIDE
+================================================== */
+
+.visual-side {
+  flex: 1;
+  background: linear-gradient(
+    135deg,
+    #004d40,
+    #1b5e20
+  );
+
+  position: relative;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  color: white;
+
+  padding: 40px;
+}
+
+
+/* ==================================================
+   3D VISUAL
+================================================== */
+
+.scene-3d {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  perspective: 1000px;
+
+  z-index: 0;
+}
+
+.node {
+  position: absolute;
+
+  background: rgba(255,255,255,0.1);
+
+  border: 1px solid rgba(255,255,255,0.2);
+
+  backdrop-filter: blur(5px);
+
+  border-radius: 12px;
+
+  animation:
+    float 6s infinite ease-in-out alternate;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.2);
+}
+
+.node-1 {
+  width: 120px;
+  height: 120px;
+
+  top: 20%;
+  left: 15%;
+
+  transform:
+    translateZ(-50px)
+    rotateY(15deg);
+
+  animation-delay: 0s;
+}
+
+.node-2 {
+  width: 180px;
+  height: 120px;
+
+  top: 50%;
+  right: 20%;
+
+  transform:
+    translateZ(50px)
+    rotateY(-20deg);
+
+  animation-delay: -2s;
+}
+
+.node-3 {
+  width: 100px;
+  height: 100px;
+
+  bottom: 15%;
+  left: 30%;
+
+  transform:
+    translateZ(100px)
+    rotateX(20deg);
+
+  animation-delay: -4s;
+}
+
+
+/* ==================================================
+   VISUAL CONTENT
+================================================== */
+
+.visual-content {
+  position: relative;
+
+  z-index: 1;
+
+  text-align: center;
+
+  max-width: 500px;
+}
+
+.visual-content h1 {
+  font-size: 48px;
+
+  margin-bottom: 16px;
+
+  background:
+    linear-gradient(
+      to right,
+      #fff,
+      #a5d6a7
+    );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.visual-content p {
+  font-size: 18px;
+
+  line-height: 1.6;
+
+  color: #e8f5e9;
+
+  opacity: 0.9;
+}
+
+
+/* ==================================================
+   HACKATHON / ORGANIZATION LOGOS
+================================================== */
+
+.project-logos {
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 28px;
+
+  margin-top: 42px;
+
+  padding: 18px 24px;
+
+  background: rgba(255,255,255,0.08);
+
+  border: 1px solid rgba(255,255,255,0.16);
+
+  border-radius: 18px;
+
+  backdrop-filter: blur(10px);
+
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.12);
+}
+
+.project-logo-sih {
+  width: 220px;
+
+  height: auto;
+
+  max-height: 105px;
+
+  object-fit: contain;
+}
+
+.project-logo-syntex {
+  width: 95px;
+
+  height: 95px;
+
+  object-fit: contain;
+}
+
+
+/* ==================================================
+   FORM SIDE
+================================================== */
+
+.form-side {
+  flex: 1;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #f4f7f6;
+
+  position: relative;
+}
+
+
+/* ==================================================
+   FORM BACKGROUND
+================================================== */
+
+.form-side::before {
+  content: '';
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  background-image:
+    radial-gradient(
+      var(--color-primary-light) 1px,
+      transparent 1px
+    );
+
+  background-size: 40px 40px;
+
+  opacity: 0.05;
+}
+
+
+/* ==================================================
+   LOGIN CARD
+================================================== */
+
+.login-card-container {
+  width: 100%;
+
+  max-width: 480px;
+
+  padding: 0 24px;
+
+  z-index: 1;
+}
+
+
+/* ==================================================
+   ROLE SELECTOR
+================================================== */
+
+.role-selector {
+  display: flex;
+
+  gap: 8px;
+
+  margin-bottom: 24px;
+
+  flex-wrap: wrap;
+
+  background: rgba(255,255,255,0.5);
+
+  padding: 6px;
+
+  border-radius:
+    var(--border-radius-md);
+
+  box-shadow:
+    inset 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.role-btn {
+  flex: 1;
+
+  padding: 12px 6px;
+
+  border: none;
+
+  background: transparent;
+
+  color: var(--text-muted);
+
+  border-radius:
+    var(--border-radius-sm);
+
+  cursor: pointer;
+
+  font-family: 'Outfit', sans-serif;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  transition:
+    all var(--transition-fast);
+}
+
+.role-btn.active {
+  background: var(--bg-surface);
+
+  color: var(--color-primary);
+
+  box-shadow:
+    var(--shadow-sm);
+}
+
+
+/* ==================================================
+   FORM OPTIONS
+================================================== */
+
+.forgot-link {
+  font-size: 13px;
+
+  font-weight: 500;
+}
+
+.form-options {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 24px;
+}
+
+
+/* ==================================================
+   ERROR MESSAGE
+================================================== */
+
+.error-msg {
+  color: #e74c3c;
+
+  font-size: 13px;
+
+  text-align: center;
+
+  margin-bottom: 16px;
+
+  min-height: 16px;
+}
+
+
+/* ==================================================
+   CREATE ACCOUNT
+================================================== */
+
+.switch-text {
+  text-align: center;
+
+  font-size: 14px;
+
+  margin-top: 24px;
+}
+
+
+/* ==================================================
+   FEEDBACK & GRIEVANCE
+================================================== */
+
+.support-options {
+  display: flex;
+
+  gap: 12px;
+
+  margin-top: 18px;
+}
+
+.support-option {
+  flex: 1;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 12px 14px;
+
+  background:
+    rgba(255,255,255,0.75);
+
+  border:
+    1px solid rgba(0,77,64,0.1);
+
+  border-radius: 10px;
+
+  text-decoration: none;
+
+  color: var(--text-main);
+
+  transition:
+    all 0.2s ease;
+}
+
+.support-option:hover {
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    var(--shadow-sm);
+}
+
+.support-icon {
+  width: 32px;
+
+  height: 32px;
+
+  min-width: 32px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e8f5e9;
+
+  color: #1b5e20;
+
+  font-weight: 700;
+
+  font-size: 15px;
+}
+
+.support-option strong {
+  display: block;
+
+  font-size: 13px;
+}
+
+.support-option small {
+  display: block;
+
+  margin-top: 2px;
+
+  color: var(--text-muted);
+
+  font-size: 11px;
+}
+
+
+/* ==================================================
+   RESPONSIVE DESIGN
+================================================== */
+
+@media (max-width: 900px) {
+
   .login-page {
-    display: flex;
-    min-height: 100vh;
-    width: 100%;
+    flex-direction: column;
   }
 
   .visual-side {
-    flex: 1;
-    background: linear-gradient(135deg, #004d40, #1b5e20);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    padding: 40px;
-  }
+    min-height: 380px;
 
-  /* 3D Visual Concept (CSS Only) */
-  .scene-3d {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    perspective: 1000px;
-    z-index: 0;
-  }
+    flex: none;
 
-  .node {
-    position: absolute;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(5px);
-    border-radius: 12px;
-    animation: float 6s infinite ease-in-out alternate;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  }
-
-  .node-1 { width: 120px; height: 120px; top: 20%; left: 15%; transform: translateZ(-50px) rotateY(15deg); animation-delay: 0s; }
-  .node-2 { width: 180px; height: 120px; top: 50%; right: 20%; transform: translateZ(50px) rotateY(-20deg); animation-delay: -2s; }
-  .node-3 { width: 100px; height: 100px; bottom: 15%; left: 30%; transform: translateZ(100px) rotateX(20deg); animation-delay: -4s; }
-
-  /* Overlay text */
-  .visual-content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    max-width: 500px;
+    padding: 35px 20px;
   }
 
   .visual-content h1 {
-    font-size: 48px;
-    margin-bottom: 16px;
-    background: linear-gradient(to right, #fff, #a5d6a7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 40px;
   }
 
   .visual-content p {
-    font-size: 18px;
-    line-height: 1.6;
-    color: #e8f5e9;
-    opacity: 0.9;
+    font-size: 16px;
   }
 
-  /* Form Side */
+  .project-logos {
+    margin-top: 30px;
+
+    gap: 20px;
+
+    padding: 14px 18px;
+  }
+
+  .project-logo-sih {
+    width: 180px;
+  }
+
+  .project-logo-syntex {
+    width: 75px;
+    height: 75px;
+  }
+
   .form-side {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f4f7f6;
-    position: relative;
+    padding: 40px 0;
+  }
+}
+
+
+@media (max-width: 500px) {
+
+  .support-options {
+    flex-direction: column;
   }
 
-  /* Subtle background pattern for form side */
-  .form-side::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: radial-gradient(var(--color-primary-light) 1px, transparent 1px);
-    background-size: 40px 40px;
-    opacity: 0.05;
+  .project-logos {
+    gap: 14px;
   }
 
-  .login-card-container {
-    width: 100%;
-    max-width: 480px;
-    padding: 0 24px;
-    z-index: 1;
+  .project-logo-sih {
+    width: 155px;
   }
 
-  .role-selector {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    background: rgba(255,255,255,0.5);
-    padding: 6px;
-    border-radius: var(--border-radius-md);
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+  .project-logo-syntex {
+    width: 65px;
+    height: 65px;
   }
 
-  .role-btn {
-    flex: 1;
-    padding: 12px 6px;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    border-radius: var(--border-radius-sm);
-    cursor: pointer;
-    font-family: 'Outfit', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    transition: all var(--transition-fast);
+  .visual-content h1 {
+    font-size: 34px;
   }
+}
 
-  .role-btn.active {
-    background: var(--bg-surface);
-    color: var(--color-primary);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .forgot-link {
-    font-size: 13px;
-    font-weight: 500;
-  }
-
-  .form-options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-  }
-
-  .switch-text {
-    text-align: center;
-    font-size: 14px;
-    margin-top: 24px;
-  }
-
-  .error-msg {
-    color: #e74c3c;
-    font-size: 13px;
-    text-align: center;
-    margin-bottom: 16px;
-    min-height: 16px;
-  }
-
-  @media (max-width: 900px) {
-    .login-page {
-      flex-direction: column;
-    }
-    .visual-side {
-      min-height: 300px;
-      flex: none;
-    }
-    .form-side {
-      padding: 40px 0;
-    }
-  }
 </style>
+
 </head>
+
+
 <body>
 
-  <div class="login-page">
-    
-    <!-- 3D Visual Side -->
-    <div class="visual-side">
-      <div class="scene-3d">
-        <div class="node node-1"></div>
-        <div class="node node-2"></div>
-        <div class="node node-3"></div>
-      </div>
-      <div class="visual-content fade-in">
-        <h1>AgriLink AI</h1>
-        <p>Smart Market Intelligence & Farmer–Buyer Linkage</p>
-      </div>
+<div class="login-page">
+
+
+  <!-- ==================================================
+       VISUAL SIDE
+  ================================================== -->
+
+  <div class="visual-side">
+
+    <!-- 3D Background -->
+    <div class="scene-3d">
+
+      <div class="node node-1"></div>
+
+      <div class="node node-2"></div>
+
+      <div class="node node-3"></div>
+
     </div>
 
-    <!-- Form Side -->
-    <div class="form-side">
-      <div class="login-card-container">
-        
-        <div class="card-3d" style="padding: 40px 32px; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px);">
-          <h2 style="font-size: 28px; margin-bottom: 8px; color: var(--text-main);">Welcome Back</h2>
-          <p style="color: var(--text-muted); margin-bottom: 32px;">Please enter your details to sign in.</p>
 
-          <!-- Role Selector -->
-          <div class="role-selector">
-            <button class="role-btn active" data-role="farmer">Farmer</button>
-            <button class="role-btn" data-role="buyer">Buyer</button>
-            <button class="role-btn" data-role="fpo">FPO</button>
-            <button class="role-btn" data-role="admin">Admin</button>
-          </div>
+    <!-- Main Content -->
+    <div class="visual-content fade-in">
 
-          <form id="loginForm">
-            <div class="input-group">
-              <label for="identifier">Mobile Number / Email</label>
-              <input type="text" id="identifier" placeholder="Enter mobile number or email" required>
-            </div>
+      <h1>AgriLink AI</h1>
 
-            <div class="input-group">
-              <label for="password">Password</label>
-              <input type="password" id="password" placeholder="Enter password" required>
-            </div>
+      <p>
+        Smart Market Intelligence & Farmer-Buyer Linkage
+      </p>
 
-            <p class="error-msg" id="errorMsg"></p>
+    </div>
 
-            <div class="form-options">
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
-                <input type="checkbox" id="remember" style="width: 16px; height: 16px;"> Remember me
-              </label>
-              <a href="#" class="forgot-link">Forgot password?</a>
-            </div>
 
-            <button type="submit" class="btn-primary" style="width: 100%;">
-              Sign In 
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-            </button>
-          </form>
+    <!-- SIH + SyntexSparks -->
+    <div class="project-logos">
 
-          <p class="switch-text">
-            New here? <a href="register.html" style="font-weight: 600;">Create an account</a>
-          </p>
-        </div>
+      <img
+        src="images/sih logo.png"
+        alt="Smart India Hackathon 2026"
+        class="project-logo-sih"
+      >
 
-      </div>
+      <img
+        src="images/SyntexSpark.png"
+        alt="SyntexSparks"
+        class="project-logo-syntex"
+      >
+
     </div>
 
   </div>
 
-  <script src="js/auth.js"></script>
+
+  <!-- ==================================================
+       FORM SIDE
+  ================================================== -->
+
+  <div class="form-side">
+
+    <div class="login-card-container">
+
+
+      <div
+        class="card-3d"
+        style="
+          padding: 40px 32px;
+          background: rgba(255,255,255,0.85);
+          backdrop-filter: blur(20px);
+        "
+      >
+
+        <h2
+          style="
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+          "
+        >
+          Welcome Back
+        </h2>
+
+
+        <p
+          style="
+            color: var(--text-muted);
+            margin-bottom: 32px;
+          "
+        >
+          Please enter your details to sign in.
+        </p>
+
+
+        <!-- ==================================================
+             ROLE SELECTOR
+        ================================================== -->
+
+        <div class="role-selector">
+
+          <button
+            class="role-btn active"
+            data-role="farmer"
+            type="button"
+          >
+            Farmer
+          </button>
+
+          <button
+            class="role-btn"
+            data-role="buyer"
+            type="button"
+          >
+            Buyer
+          </button>
+
+          <button
+            class="role-btn"
+            data-role="admin"
+            type="button"
+          >
+            Admin
+          </button>
+
+        </div>
+
+
+        <!-- ==================================================
+             LOGIN FORM
+        ================================================== -->
+
+        <form id="loginForm">
+
+
+          <div class="input-group">
+
+            <label for="identifier">
+              Mobile Number / Email
+            </label>
+
+            <input
+              type="text"
+              id="identifier"
+              placeholder="Enter mobile number or email"
+              required
+            >
+
+          </div>
+
+
+          <div class="input-group">
+
+            <label for="password">
+              Password
+            </label>
+
+            <input
+              type="password"
+              id="password"
+              placeholder="Enter password"
+              required
+            >
+
+          </div>
+
+
+          <p
+            class="error-msg"
+            id="errorMsg"
+          ></p>
+
+
+          <!-- ==================================================
+               FORM OPTIONS
+          ================================================== -->
+
+          <div class="form-options">
+
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+                cursor: pointer;
+              "
+            >
+
+              <input
+                type="checkbox"
+                id="remember"
+                style="
+                  width: 16px;
+                  height: 16px;
+                "
+              >
+
+              Remember me
+
+            </label>
+
+
+            <a
+              href="#"
+              class="forgot-link"
+            >
+              Forgot password?
+            </a>
+
+          </div>
+
+
+          <!-- ==================================================
+               SIGN IN
+          ================================================== -->
+
+          <button
+            type="submit"
+            class="btn-primary"
+            style="width: 100%;"
+          >
+
+            Sign In
+
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+
+              <path d="M5 12h14"></path>
+
+              <path d="m12 5 7 7-7 7"></path>
+
+            </svg>
+
+          </button>
+
+        </form>
+
+
+        <!-- ==================================================
+             CREATE ACCOUNT
+        ================================================== -->
+
+        <p class="switch-text">
+
+          New here?
+
+          <a
+            href="register.html"
+            style="font-weight: 600;"
+          >
+            Create an account
+          </a>
+
+        </p>
+
+
+        <!-- ==================================================
+             FEEDBACK & GRIEVANCE
+        ================================================== -->
+
+        <div class="support-options">
+
+          <!-- Feedback -->
+          <a
+            href="https://forms.gle/cNijtWfNGuojAsyk6"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="support-option"
+          >
+
+            <span class="support-icon">
+              ✎
+            </span>
+
+            <span>
+
+              <strong>
+                Feedback
+              </strong>
+
+              <small>
+                Share your suggestions
+              </small>
+
+            </span>
+
+          </a>
+
+
+          <!-- Grievance -->
+          <a
+            href="https://forms.gle/UpUHcmMimy5YGP74A"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="support-option"
+          >
+
+            <span class="support-icon">
+              !
+            </span>
+
+            <span>
+
+              <strong>
+                Grievance
+              </strong>
+
+              <small>
+                Report a problem
+              </small>
+
+            </span>
+
+          </a>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ==================================================
+     AUTHENTICATION JAVASCRIPT
+================================================== -->
+
+<script src="js/auth.js"></script>
+
 </body>
+
 </html>

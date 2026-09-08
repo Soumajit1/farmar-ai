@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Transactions — Buyer — AgriLink AI</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+
+            <div class="sidebar-logo">
+
+                <i data-lucide="tractor"></i>
+
+                AgriLink AI
+
+            </div>
+
+        </div>
+
+
+        <nav class="nav-menu">
+
+            <a
+                href="dashboard-buyer.html"
+                class="nav-item"
+            >
+                Overview
+            </a>
+
+            <a
+                href="dashboard-buyer.html#marketplace"
+                class="nav-item"
+            >
+                Marketplace
+            </a>
+
+            <a
+                href="buyer-offers.html"
+                class="nav-item"
+            >
+                My Offers
+            </a>
+
+            <a
+                href="buyer-transactions.html"
+                class="nav-item active"
+            >
+                Transactions
+            </a>
+
+            <a
+                href="buyer-logistics.html"
+                class="nav-item"
+            >
+                Logistics
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <a
+                href="#"
+                class="nav-item"
+                style="color:#e74c3c;padding:0;"
+                onclick="logout()"
+            >
+                Log Out
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <header class="topbar glass-panel">
+
+            <h2 class="page-title">
+                Transactions
+            </h2>
+
+
+            <div class="topbar-actions">
+
+                <button
+                    id="notifBtn"
+                    class="btn-secondary"
+                    style="
+                        padding:8px 12px;
+                        display:flex;
+                        align-items:center;
+                        gap:8px;
+                    "
+                >
+
+                    <i
+                        data-lucide="bell"
+                        style="width:16px;height:16px;"
+                    ></i>
+
+                    Notifications
+
+                </button>
+
+
+                <div class="user-profile">
+
+                    <div
+                        class="avatar"
+                        id="userAvatar"
+                    >
+                        B
+                    </div>
+
+                    <span
+                        id="userName"
+                        style="font-weight:500;"
+                    >
+                        Buyer
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="dashboard-container fade-in">
+
+
+            <!-- STATISTICS -->
+
+            <div
+                class="grid-cards"
+                style="margin-bottom:24px;"
+            >
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-header">
+
+                        <span>
+                            Total Spent
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="totalSpent"
+                    >
+                        ₹0
+                    </div>
+
+                </div>
+
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-header">
+
+                        <span>
+                            Completed Purchases
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="completedCount"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-header">
+
+                        <span>
+                            Pending Payment
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="pendingAmount"
+                        style="color:#f39c12;"
+                    >
+                        ₹0
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILTERS -->
+
+            <div
+                style="
+                    display:flex;
+                    gap:12px;
+                    flex-wrap:wrap;
+                    margin-bottom:20px;
+                    align-items:center;
+                "
+            >
+
+                <input
+                    type="date"
+                    id="fromDate"
+                    style="
+                        padding:10px 14px;
+                        border:1px solid #e0e0e0;
+                        border-radius:8px;
+                    "
+                >
+
+                <span
+                    style="color:var(--text-muted);"
+                >
+                    to
+                </span>
+
+                <input
+                    type="date"
+                    id="toDate"
+                    style="
+                        padding:10px 14px;
+                        border:1px solid #e0e0e0;
+                        border-radius:8px;
+                    "
+                >
+
+                <select
+                    id="statusFilter"
+                    style="
+                        padding:10px 14px;
+                        border:1px solid #e0e0e0;
+                        border-radius:8px;
+                    "
+                >
+
+                    <option value="all">
+                        All Status
+                    </option>
+
+                    <option value="pending">
+                        Pending
+                    </option>
+
+                    <option value="completed">
+                        Completed
+                    </option>
+
+                    <option value="cancelled">
+                        Cancelled
+                    </option>
+
+                </select>
+
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search seller or produce..."
+                    style="
+                        padding:10px 14px;
+                        border:1px solid #e0e0e0;
+                        border-radius:8px;
+                        min-width:220px;
+                    "
+                >
+
+
+                <button
+                    class="btn-secondary"
+                    id="refreshBtn"
+                    style="
+                        padding:10px 20px;
+                        display:flex;
+                        align-items:center;
+                        gap:8px;
+                    "
+                >
+
+                    <i
+                        data-lucide="refresh-cw"
+                        style="width:16px;height:16px;"
+                    ></i>
+
+                    Refresh
+
+                </button>
+
+
+                <button
+                    class="btn-primary"
+                    id="exportBtn"
+                    style="
+                        padding:10px 20px;
+                        display:flex;
+                        align-items:center;
+                        gap:8px;
+                    "
+                >
+
+                    <i
+                        data-lucide="download"
+                        style="width:16px;height:16px;"
+                    ></i>
+
+                    Export CSV
+
+                </button>
+
+            </div>
+
+
+            <!-- PURCHASE HISTORY -->
+
+            <div class="dashboard-section glass-panel">
+
+                <div
+                    class="section-title"
+                    style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                    "
+                >
+
+                    <span>
+                        Purchase History
+                    </span>
+
+                    <span
+                        id="transactionCount"
+                        style="
+                            font-size:13px;
+                            color:var(--text-muted);
+                            font-weight:normal;
+                        "
+                    >
+                        0 transactions
+                    </span>
+
+                </div>
+
+
+                <div style="overflow-x:auto;">
+
+                    <table class="data-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Txn ID</th>
+                                <th>Date</th>
+                                <th>Seller</th>
+                                <th>Produce</th>
+                                <th>Qty</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="transactionTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="8"
+                                    style="
+                                        text-align:center;
+                                        padding:40px;
+                                        color:var(--text-muted);
+                                    "
+                                >
+                                    Loading transactions...
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+const API_BASE =
+    'http://localhost:5000';
+
+
+// --------------------------------------------------
+// CURRENT BUYER
+// --------------------------------------------------
+
+const buyerId =
+    Number(
+        localStorage.getItem('agrilink_user_id')
+    ) || 5;
+
+
+const storedUser =
+    localStorage.getItem('agrilink_user');
+
+
+let buyerName = 'Buyer';
+
+
+try {
+
+    if (storedUser) {
+
+        const parsed =
+            JSON.parse(storedUser);
+
+        buyerName =
+            parsed.name ||
+            parsed.email ||
+            storedUser;
+
+    }
+
+} catch (error) {
+
+    buyerName =
+        storedUser || 'Buyer';
+
+}
+
+
+document.getElementById(
+    'userName'
+).textContent = buyerName;
+
+
+document.getElementById(
+    'userAvatar'
+).textContent =
+    buyerName
+        .charAt(0)
+        .toUpperCase();
+
+
+// --------------------------------------------------
+// DATA
+// --------------------------------------------------
+
+let transactions = [];
+
+
+// --------------------------------------------------
+// HELPERS
+// --------------------------------------------------
+
+function formatCurrency(value) {
+
+    const number =
+        Number(value) || 0;
+
+    return new Intl.NumberFormat(
+        'en-IN',
+        {
+            style: 'currency',
+            currency: 'INR',
+            maximumFractionDigits: 2
+        }
+    ).format(number);
+
+}
+
+
+function formatDate(dateValue) {
+
+    if (!dateValue) {
+        return '—';
+    }
+
+    const date =
+        new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+        return '—';
+    }
+
+    return date.toLocaleDateString(
+        'en-IN',
+        {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        }
+    );
+
+}
+
+
+function escapeHtml(value) {
+
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+}
+
+
+function statusBadge(status) {
+
+    const normalized =
+        String(status || '')
+            .toLowerCase();
+
+    if (normalized === 'completed') {
+
+        return `
+            <span class="badge badge-success">
+                Completed
+            </span>
+        `;
+
+    }
+
+    if (normalized === 'cancelled') {
+
+        return `
+            <span
+                class="badge"
+                style="
+                    background:#ffebee;
+                    color:#c62828;
+                "
+            >
+                Cancelled
+            </span>
+        `;
+
+    }
+
+    return `
+        <span class="badge badge-warning">
+            Pending
+        </span>
+    `;
+
+}
+
+
+// --------------------------------------------------
+// LOAD TRANSACTIONS
+// --------------------------------------------------
+
+async function loadTransactions() {
+
+    const tbody =
+        document.getElementById(
+            'transactionTableBody'
+        );
+
+    tbody.innerHTML = `
+        <tr>
+            <td
+                colspan="8"
+                style="
+                    text-align:center;
+                    padding:40px;
+                    color:var(--text-muted);
+                "
+            >
+                Loading transactions...
+            </td>
+        </tr>
+    `;
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/buyer/transactions/${buyerId}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                'Failed to load transactions'
+            );
+
+        }
+
+
+        transactions =
+            Array.isArray(data)
+                ? data
+                : (
+                    Array.isArray(data.transactions)
+                        ? data.transactions
+                        : []
+                );
+
+
+        updateStatistics();
+
+        renderTransactions();
+
+    } catch (error) {
+
+        console.error(
+            'Transaction loading error:',
+            error
+        );
+
+
+        tbody.innerHTML = `
+            <tr>
+                <td
+                    colspan="8"
+                    style="
+                        text-align:center;
+                        padding:40px;
+                        color:#e74c3c;
+                    "
+                >
+                    Failed to load transactions.
+                    <br>
+                    <small>
+                        ${escapeHtml(error.message)}
+                    </small>
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+
+// --------------------------------------------------
+// STATISTICS
+// --------------------------------------------------
+
+function updateStatistics() {
+
+    let totalSpent = 0;
+
+    let completedCount = 0;
+
+    let pendingAmount = 0;
+
+
+    transactions.forEach(
+        transaction => {
+
+            const amount =
+                Number(transaction.amount) || 0;
+
+
+            if (
+                String(transaction.status)
+                    .toLowerCase() === 'completed'
+            ) {
+
+                totalSpent += amount;
+
+                completedCount++;
+
+            }
+
+
+            if (
+                String(transaction.status)
+                    .toLowerCase() === 'pending'
+            ) {
+
+                pendingAmount += amount;
+
+            }
+
+        }
+    );
+
+
+    document.getElementById(
+        'totalSpent'
+    ).textContent =
+        formatCurrency(totalSpent);
+
+
+    document.getElementById(
+        'completedCount'
+    ).textContent =
+        completedCount;
+
+
+    document.getElementById(
+        'pendingAmount'
+    ).textContent =
+        formatCurrency(pendingAmount);
+
+}
+
+
+// --------------------------------------------------
+// FILTER
+// --------------------------------------------------
+
+function getFilteredTransactions() {
+
+    const search =
+        document.getElementById(
+            'searchInput'
+        ).value
+            .trim()
+            .toLowerCase();
+
+
+    const status =
+        document.getElementById(
+            'statusFilter'
+        ).value
+            .toLowerCase();
+
+
+    const fromDate =
+        document.getElementById(
+            'fromDate'
+        ).value;
+
+
+    const toDate =
+        document.getElementById(
+            'toDate'
+        ).value;
+
+
+    return transactions.filter(
+        transaction => {
+
+            const seller =
+                String(
+                    transaction.farmer_name ||
+                    transaction.seller_name ||
+                    ''
+                ).toLowerCase();
+
+
+            const produce =
+                String(
+                    transaction.crop_name ||
+                    transaction.produce_name ||
+                    ''
+                ).toLowerCase();
+
+
+            const transactionStatus =
+                String(
+                    transaction.status ||
+                    ''
+                ).toLowerCase();
+
+
+            const transactionDate =
+                transaction.transaction_date ||
+                transaction.created_at;
+
+
+            const date =
+                transactionDate
+                    ? new Date(transactionDate)
+                    : null;
+
+
+            if (
+                search &&
+                !seller.includes(search) &&
+                !produce.includes(search)
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+                status !== 'all' &&
+                transactionStatus !== status
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+                fromDate &&
+                date &&
+                date < new Date(
+                    `${fromDate}T00:00:00`
+                )
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+                toDate &&
+                date &&
+                date > new Date(
+                    `${toDate}T23:59:59`
+                )
+            ) {
+
+                return false;
+
+            }
+
+
+            return true;
+
+        }
+    );
+
+}
+
+
+// --------------------------------------------------
+// RENDER TRANSACTIONS
+// --------------------------------------------------
+
+function renderTransactions() {
+
+    const tbody =
+        document.getElementById(
+            'transactionTableBody'
+        );
+
+
+    const filtered =
+        getFilteredTransactions();
+
+
+    document.getElementById(
+        'transactionCount'
+    ).textContent =
+        `${filtered.length} transaction${filtered.length === 1 ? '' : 's'}`;
+
+
+    if (!filtered.length) {
+
+        tbody.innerHTML = `
+            <tr>
+
+                <td
+                    colspan="8"
+                    style="
+                        text-align:center;
+                        padding:45px;
+                        color:var(--text-muted);
+                    "
+                >
+
+                    <div
+                        style="
+                            display:flex;
+                            flex-direction:column;
+                            align-items:center;
+                            gap:10px;
+                        "
+                    >
+
+                        <i
+                            data-lucide="receipt"
+                            style="
+                                width:42px;
+                                height:42px;
+                                opacity:.5;
+                            "
+                        ></i>
+
+                        <strong>
+                            No transactions found
+                        </strong>
+
+                        <span>
+                            Your purchase transactions will appear here.
+                        </span>
+
+                    </div>
+
+                </td>
+
+            </tr>
+        `;
+
+        lucide.createIcons();
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        filtered.map(
+            transaction => {
+
+                const id =
+                    transaction.id;
+
+
+                const txnId =
+                    `TXN-${String(id).padStart(4, '0')}`;
+
+
+                const seller =
+                    transaction.farmer_name ||
+                    transaction.seller_name ||
+                    'Seller';
+
+
+                const produce =
+                    transaction.crop_name ||
+                    transaction.produce_name ||
+                    'Produce';
+
+
+                const quantity =
+                    Number(
+                        transaction.quantity
+                    ) || 0;
+
+
+                const unit =
+                    transaction.unit ||
+                    'kg';
+
+
+                const amount =
+                    Number(
+                        transaction.amount
+                    ) || 0;
+
+
+                const date =
+                    formatDate(
+                        transaction.transaction_date
+                    );
+
+
+                const status =
+                    String(
+                        transaction.status ||
+                        'pending'
+                    ).toLowerCase();
+
+
+                let action = '—';
+
+
+                if (
+                    status === 'completed'
+                ) {
+
+                    action = `
+                        <button
+                            class="badge"
+                            style="
+                                background:#e8f5e9;
+                                color:#2e7d32;
+                                border:none;
+                                cursor:pointer;
+                            "
+                            onclick="downloadInvoice(${Number(id)})"
+                        >
+                            Invoice
+                        </button>
+                    `;
+
+                }
+
+
+                return `
+
+                    <tr>
+
+                        <td>
+                            ${escapeHtml(txnId)}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(date)}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(seller)}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(produce)}
+                        </td>
+
+                        <td>
+                            ${quantity}
+                            ${escapeHtml(unit)}
+                        </td>
+
+                        <td>
+                            ${formatCurrency(amount)}
+                        </td>
+
+                        <td>
+                            ${statusBadge(status)}
+                        </td>
+
+                        <td>
+                            ${action}
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        ).join('');
+
+}
+
+
+// --------------------------------------------------
+// INVOICE
+// --------------------------------------------------
+
+function downloadInvoice(transactionId) {
+
+    const transaction =
+        transactions.find(
+            item =>
+                Number(item.id) ===
+                Number(transactionId)
+        );
+
+
+    if (!transaction) {
+
+        alert(
+            'Transaction not found.'
+        );
+
+        return;
+
+    }
+
+
+    const txnId =
+        `TXN-${String(
+            transaction.id
+        ).padStart(4, '0')}`;
+
+
+    const seller =
+        transaction.farmer_name ||
+        transaction.seller_name ||
+        'Seller';
+
+
+    const produce =
+        transaction.crop_name ||
+        transaction.produce_name ||
+        'Produce';
+
+
+    const quantity =
+        Number(transaction.quantity) || 0;
+
+
+    const unit =
+        transaction.unit || 'kg';
+
+
+    const amount =
+        Number(transaction.amount) || 0;
+
+
+    const date =
+        formatDate(
+            transaction.transaction_date
+        );
+
+
+    const invoiceContent = `
+
+AgriLink AI
+PURCHASE INVOICE
+
+Transaction ID: ${txnId}
+Date: ${date}
+
+Buyer: ${buyerName}
+Seller: ${seller}
+
+Produce: ${produce}
+Quantity: ${quantity} ${unit}
+
+Amount: ${formatCurrency(amount)}
+
+Status: ${transaction.status}
+
+Thank you for using AgriLink AI.
+`;
+
+
+    const blob =
+        new Blob(
+            [invoiceContent],
+            {
+                type: 'text/plain'
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const link =
+        document.createElement('a');
+
+
+    link.href = url;
+
+    link.download =
+        `${txnId}-invoice.txt`;
+
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+// --------------------------------------------------
+// EXPORT CSV
+// --------------------------------------------------
+
+function exportCSV() {
+
+    const data =
+        getFilteredTransactions();
+
+
+    if (!data.length) {
+
+        alert(
+            'There are no transactions to export.'
+        );
+
+        return;
+
+    }
+
+
+    const header = [
+        'Transaction ID',
+        'Date',
+        'Seller',
+        'Produce',
+        'Quantity',
+        'Unit',
+        'Amount',
+        'Status'
+    ];
+
+
+    const rows =
+        data.map(
+            transaction => [
+
+                `TXN-${String(
+                    transaction.id
+                ).padStart(4, '0')}`,
+
+                formatDate(
+                    transaction.transaction_date
+                ),
+
+                transaction.farmer_name ||
+                transaction.seller_name ||
+                '',
+
+                transaction.crop_name ||
+                transaction.produce_name ||
+                '',
+
+                transaction.quantity ||
+                '',
+
+                transaction.unit ||
+                'kg',
+
+                transaction.amount ||
+                0,
+
+                transaction.status ||
+                ''
+
+            ]
+        );
+
+
+    const csv =
+        [
+            header,
+            ...rows
+        ]
+        .map(
+            row =>
+                row.map(
+                    value =>
+                        `"${String(value)
+                            .replace(/"/g, '""')}"`
+                ).join(',')
+        )
+        .join('\n');
+
+
+    const blob =
+        new Blob(
+            [csv],
+            {
+                type: 'text/csv;charset=utf-8;'
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const link =
+        document.createElement('a');
+
+
+    link.href = url;
+
+    link.download =
+        'agrilink-buyer-transactions.csv';
+
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+// --------------------------------------------------
+// EVENTS
+// --------------------------------------------------
+
+document.getElementById(
+    'searchInput'
+).addEventListener(
+    'input',
+    renderTransactions
+);
+
+
+document.getElementById(
+    'statusFilter'
+).addEventListener(
+    'change',
+    renderTransactions
+);
+
+
+document.getElementById(
+    'fromDate'
+).addEventListener(
+    'change',
+    renderTransactions
+);
+
+
+document.getElementById(
+    'toDate'
+).addEventListener(
+    'change',
+    renderTransactions
+);
+
+
+document.getElementById(
+    'refreshBtn'
+).addEventListener(
+    'click',
+    loadTransactions
+);
+
+
+document.getElementById(
+    'exportBtn'
+).addEventListener(
+    'click',
+    exportCSV
+);
+
+
+// --------------------------------------------------
+// LOGOUT
+// --------------------------------------------------
+
+function logout() {
+
+    localStorage.removeItem(
+        'agrilink_token'
+    );
+
+    localStorage.removeItem(
+        'agrilink_role'
+    );
+
+    localStorage.removeItem(
+        'agrilink_user'
+    );
+
+    localStorage.removeItem(
+        'agrilink_email'
+    );
+
+    localStorage.removeItem(
+        'agrilink_user_id'
+    );
+
+
+    window.location.href =
+        'index.html';
+
+}
+
+
+// --------------------------------------------------
+// START
+// --------------------------------------------------
+
+lucide.createIcons();
+
+loadTransactions();
+
+</script>
+
+
+<script src="js/dashboard.js?v=3"></script>
+
+</body>
+
+</html>

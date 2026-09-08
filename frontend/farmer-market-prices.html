@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Market Prices — AgriLink AI</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+
+.trend-up {
+    color:#27ae60;
+    font-weight:600;
+}
+
+.trend-down {
+    color:#e74c3c;
+    font-weight:600;
+}
+
+.filter-bar {
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-bottom:24px;
+}
+
+.filter-bar input,
+.filter-bar select {
+    padding:10px 14px;
+    border:1px solid #e0e0e0;
+    border-radius:8px;
+    font-size:14px;
+    color:var(--text-main);
+    background:white;
+}
+
+.filter-bar input {
+    min-width:220px;
+}
+
+.ai-insight-row {
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-top:24px;
+}
+
+.ai-insight-card {
+    flex:1;
+    min-width:220px;
+    background:linear-gradient(135deg,#1b5e20,#004d40);
+    color:white;
+    border-radius:12px;
+    padding:20px;
+}
+
+.ai-insight-card h4 {
+    font-size:13px;
+    opacity:.8;
+    margin-bottom:8px;
+    font-weight:500;
+}
+
+.ai-insight-card p {
+    font-size:15px;
+    font-weight:600;
+    line-height:1.5;
+}
+
+.price-summary {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+    margin-bottom:24px;
+}
+
+.summary-card {
+    padding:18px;
+    border-radius:12px;
+    background:white;
+    border:1px solid #eee;
+}
+
+.summary-label {
+    font-size:13px;
+    color:var(--text-muted);
+    margin-bottom:8px;
+}
+
+.summary-value {
+    font-size:24px;
+    font-weight:700;
+}
+
+.table-wrapper {
+    overflow-x:auto;
+}
+
+.data-table {
+    width:100%;
+}
+
+.data-table tbody tr {
+    transition:.2s;
+}
+
+.data-table tbody tr:hover {
+    background:#f8faf8;
+}
+
+.no-results {
+    text-align:center;
+    padding:30px;
+    color:var(--text-muted);
+}
+
+.refresh-info {
+    margin-top:12px;
+    font-size:13px;
+    color:var(--text-muted);
+}
+
+@media(max-width:700px) {
+
+    .price-summary {
+        grid-template-columns:1fr;
+    }
+
+    .filter-bar input {
+        width:100%;
+        min-width:0;
+    }
+
+    .filter-bar select {
+        flex:1;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+
+            <div class="sidebar-logo">
+
+                <i data-lucide="tractor"></i>
+
+                AgriLink AI
+
+            </div>
+
+        </div>
+
+
+        <nav class="nav-menu">
+
+            <a
+                href="dashboard-farmer.html"
+                class="nav-item"
+            >
+                Overview
+            </a>
+
+            <a
+                href="farmer-market-prices.html"
+                class="nav-item active"
+            >
+                Market Prices
+            </a>
+
+            <a
+                href="farmer-produce.html"
+                class="nav-item"
+            >
+                My Produce
+            </a>
+
+            <a
+                href="farmer-offers.html"
+                class="nav-item"
+            >
+                Buyer Offers
+            </a>
+
+            <a
+                href="farmer-transactions.html"
+                class="nav-item"
+            >
+                Transactions
+            </a>
+
+            <a
+                href="farmer-logistics.html"
+                class="nav-item"
+            >
+                Logistics
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <a
+                href="#"
+                onclick="logout()"
+                class="nav-item"
+                style="color:#e74c3c;padding:0;"
+            >
+                Log Out
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <header class="topbar glass-panel">
+
+            <h2 class="page-title">
+                Market Prices
+            </h2>
+
+
+            <div class="topbar-actions">
+
+                <button
+                    id="notifBtn"
+                    class="btn-secondary"
+                    style="
+                        padding:8px 12px;
+                        display:flex;
+                        align-items:center;
+                        gap:8px;
+                    "
+                >
+
+                    <i
+                        data-lucide="bell"
+                        style="width:16px;height:16px;"
+                    ></i>
+
+                    Notifications
+
+                </button>
+
+
+                <div class="user-profile">
+
+                    <div
+                        class="avatar"
+                        id="userAvatar"
+                    >
+                        F
+                    </div>
+
+                    <span
+                        id="userName"
+                        style="font-weight:500;"
+                    >
+                        Farmer
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <div class="dashboard-container fade-in">
+
+
+            <!-- FILTERS -->
+
+            <div class="filter-bar">
+
+                <select id="commodityFilter">
+
+                    <option value="">
+                        All Commodities
+                    </option>
+
+                    <option value="Wheat">
+                        Wheat
+                    </option>
+
+                    <option value="Rice">
+                        Rice
+                    </option>
+
+                    <option value="Potatoes">
+                        Potatoes
+                    </option>
+
+                    <option value="Tomatoes">
+                        Tomatoes
+                    </option>
+
+                    <option value="Onion">
+                        Onion
+                    </option>
+
+                    <option value="Mustard">
+                        Mustard
+                    </option>
+
+                    <option value="Soybean">
+                        Soybean
+                    </option>
+
+                    <option value="Maize">
+                        Maize
+                    </option>
+
+                </select>
+
+
+                <select id="districtFilter">
+
+                    <option value="">
+                        All Districts
+                    </option>
+
+                    <option value="Asansol">
+                        Asansol
+                    </option>
+
+                    <option value="Bardhaman">
+                        Bardhaman
+                    </option>
+
+                    <option value="Hooghly">
+                        Hooghly
+                    </option>
+
+                    <option value="Bankura">
+                        Bankura
+                    </option>
+
+                    <option value="Purulia">
+                        Purulia
+                    </option>
+
+                </select>
+
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search commodity..."
+                >
+
+
+                <button
+                    id="refreshBtn"
+                    class="btn-primary"
+                    style="padding:10px 20px;"
+                >
+                    Refresh Prices
+                </button>
+
+            </div>
+
+
+
+            <!-- SUMMARY -->
+
+            <div class="price-summary">
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Commodities Tracked
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="commodityCount"
+                    >
+                        8
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Highest Current Price
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="highestPrice"
+                    >
+                        ₹5,800
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Average Price
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="averagePrice"
+                    >
+                        ₹2,700
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- MARKET TABLE -->
+
+            <div class="dashboard-section glass-panel">
+
+                <div class="section-title">
+                    Market Prices (₹/Quintal)
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table class="data-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Commodity
+                                </th>
+
+                                <th>
+                                    Variety
+                                </th>
+
+                                <th>
+                                    District
+                                </th>
+
+                                <th>
+                                    Current Price
+                                </th>
+
+                                <th>
+                                    7-Day High
+                                </th>
+
+                                <th>
+                                    7-Day Low
+                                </th>
+
+                                <th>
+                                    Trend
+                                </th>
+
+                                <th>
+                                    Last Updated
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="marketTableBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div
+                    class="refresh-info"
+                    id="refreshInfo"
+                >
+                    Prices loaded from the current market dataset.
+                </div>
+
+            </div>
+
+
+
+            <!-- AI INSIGHTS -->
+
+            <div class="ai-insight-row">
+
+
+                <div class="ai-insight-card">
+
+                    <h4>
+
+                        <i
+                            data-lucide="bot"
+                            style="
+                                width:14px;
+                                height:14px;
+                                display:inline;
+                            "
+                        ></i>
+
+                        AI Recommendation
+
+                    </h4>
+
+                    <p id="recommendationText">
+
+                        Wheat prices are showing an upward trend.
+                        Compare buyer offers before selling.
+
+                    </p>
+
+                </div>
+
+
+
+                <div class="ai-insight-card">
+
+                    <h4>
+
+                        <i
+                            data-lucide="trending-up"
+                            style="
+                                width:14px;
+                                height:14px;
+                                display:inline;
+                            "
+                        ></i>
+
+                        Demand Alert
+
+                    </h4>
+
+                    <p id="demandText">
+
+                        Onion currently has one of the strongest
+                        positive price movements in the dataset.
+
+                    </p>
+
+                </div>
+
+
+
+                <div class="ai-insight-card">
+
+                    <h4>
+
+                        <i
+                            data-lucide="alert-triangle"
+                            style="
+                                width:14px;
+                                height:14px;
+                                display:inline;
+                            "
+                        ></i>
+
+                        Price Warning
+
+                    </h4>
+
+                    <p id="warningText">
+
+                        Monitor commodities showing negative
+                        seven-day trends before listing.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+<script>
+
+
+// =====================================================
+// USER
+// =====================================================
+
+const user =
+    localStorage.getItem("agrilink_user") ||
+    "Farmer";
+
+const role =
+    localStorage.getItem("agrilink_role");
+
+
+if (!role || role !== "farmer") {
+
+    window.location.href =
+        "index.html";
+
+}
+
+
+document.getElementById("userName")
+    .textContent = user;
+
+
+document.getElementById("userAvatar")
+    .textContent =
+    user.charAt(0).toUpperCase();
+
+
+
+// =====================================================
+// MARKET DATA
+// =====================================================
+//
+// This is the current project dataset.
+// It can later be connected to a government/API source
+// without changing the page structure.
+// =====================================================
+
+const marketData = [
+
+    {
+        commodity:"Wheat",
+        variety:"Grade A",
+        district:"Bardhaman",
+        current:2200,
+        high:2250,
+        low:2100,
+        trend:2.5
+    },
+
+    {
+        commodity:"Rice",
+        variety:"Basmati",
+        district:"Hooghly",
+        current:3600,
+        high:3700,
+        low:3500,
+        trend:-1.2
+    },
+
+    {
+        commodity:"Potatoes",
+        variety:"Jyoti",
+        district:"Bardhaman",
+        current:850,
+        high:920,
+        low:780,
+        trend:5.0
+    },
+
+    {
+        commodity:"Tomatoes",
+        variety:"Hybrid",
+        district:"Asansol",
+        current:1200,
+        high:1400,
+        low:1100,
+        trend:-3.1
+    },
+
+    {
+        commodity:"Onion",
+        variety:"Red",
+        district:"Bankura",
+        current:2100,
+        high:2150,
+        low:1800,
+        trend:8.4
+    },
+
+    {
+        commodity:"Mustard",
+        variety:"Yellow",
+        district:"Purulia",
+        current:5800,
+        high:6000,
+        low:5600,
+        trend:1.8
+    },
+
+    {
+        commodity:"Soybean",
+        variety:"JS-335",
+        district:"Bardhaman",
+        current:4200,
+        high:4350,
+        low:4100,
+        trend:-0.7
+    },
+
+    {
+        commodity:"Maize",
+        variety:"Single Cross",
+        district:"Hooghly",
+        current:1850,
+        high:1900,
+        low:1750,
+        trend:3.2
+    }
+
+];
+
+
+
+// =====================================================
+// FORMAT CURRENCY
+// =====================================================
+
+function currency(value) {
+
+    return "₹" +
+        Number(value).toLocaleString("en-IN");
+
+}
+
+
+
+// =====================================================
+// TIME
+// =====================================================
+
+function getUpdatedTime() {
+
+    const now =
+        new Date();
+
+    return now.toLocaleTimeString(
+        "en-IN",
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+
+}
+
+
+
+// =====================================================
+// RENDER MARKET
+// =====================================================
+
+function renderMarket() {
+
+    const commodity =
+        document.getElementById(
+            "commodityFilter"
+        ).value.toLowerCase();
+
+
+    const district =
+        document.getElementById(
+            "districtFilter"
+        ).value.toLowerCase();
+
+
+    const search =
+        document.getElementById(
+            "searchInput"
+        ).value
+        .trim()
+        .toLowerCase();
+
+
+    const filtered =
+        marketData.filter(item => {
+
+            const matchesCommodity =
+                !commodity ||
+                item.commodity.toLowerCase() === commodity;
+
+
+            const matchesDistrict =
+                !district ||
+                item.district.toLowerCase() === district;
+
+
+            const matchesSearch =
+                !search ||
+                item.commodity
+                    .toLowerCase()
+                    .includes(search) ||
+
+                item.variety
+                    .toLowerCase()
+                    .includes(search) ||
+
+                item.district
+                    .toLowerCase()
+                    .includes(search);
+
+
+            return (
+                matchesCommodity &&
+                matchesDistrict &&
+                matchesSearch
+            );
+
+        });
+
+
+    const tbody =
+        document.getElementById(
+            "marketTableBody"
+        );
+
+
+    if (filtered.length === 0) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="8"
+                    class="no-results"
+                >
+                    No market prices found.
+                </td>
+
+            </tr>
+
+        `;
+
+        updateSummary([]);
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        filtered.map(item => {
+
+            const trendClass =
+                item.trend >= 0
+                    ? "trend-up"
+                    : "trend-down";
+
+
+            const trendSymbol =
+                item.trend >= 0
+                    ? "↑"
+                    : "↓";
+
+
+            return `
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            ${escapeHtml(item.commodity)}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${escapeHtml(item.variety)}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(item.district)}
+                    </td>
+
+                    <td>
+                        <strong>
+                            ${currency(item.current)}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${currency(item.high)}
+                    </td>
+
+                    <td>
+                        ${currency(item.low)}
+                    </td>
+
+                    <td class="${trendClass}">
+                        ${trendSymbol}
+                        ${Math.abs(item.trend).toFixed(1)}%
+                    </td>
+
+                    <td>
+                        Just updated
+                    </td>
+
+                </tr>
+
+            `;
+
+        }).join("");
+
+
+    updateSummary(filtered);
+
+}
+
+
+
+// =====================================================
+// SUMMARY
+// =====================================================
+
+function updateSummary(data) {
+
+    const count =
+        data.length;
+
+
+    document.getElementById(
+        "commodityCount"
+    ).textContent =
+        count;
+
+
+    if (count === 0) {
+
+        document.getElementById(
+            "highestPrice"
+        ).textContent = "₹0";
+
+
+        document.getElementById(
+            "averagePrice"
+        ).textContent = "₹0";
+
+        return;
+
+    }
+
+
+    const highest =
+        Math.max(
+            ...data.map(
+                item => Number(item.current)
+            )
+        );
+
+
+    const average =
+        data.reduce(
+            (sum,item) =>
+                sum + Number(item.current),
+            0
+        ) / count;
+
+
+    document.getElementById(
+        "highestPrice"
+    ).textContent =
+        currency(highest);
+
+
+    document.getElementById(
+        "averagePrice"
+    ).textContent =
+        currency(Math.round(average));
+
+}
+
+
+
+// =====================================================
+// REFRESH
+// =====================================================
+
+function refreshPrices() {
+
+    const button =
+        document.getElementById(
+            "refreshBtn"
+        );
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "Refreshing...";
+
+
+    setTimeout(() => {
+
+        renderMarket();
+
+
+        document.getElementById(
+            "refreshInfo"
+        ).textContent =
+            "Prices refreshed at " +
+            getUpdatedTime();
+
+
+        button.disabled = false;
+
+        button.textContent =
+            "Refresh Prices";
+
+    },500);
+
+}
+
+
+
+// =====================================================
+// EVENTS
+// =====================================================
+
+document.getElementById(
+    "commodityFilter"
+).addEventListener(
+    "change",
+    renderMarket
+);
+
+
+document.getElementById(
+    "districtFilter"
+).addEventListener(
+    "change",
+    renderMarket
+);
+
+
+document.getElementById(
+    "searchInput"
+).addEventListener(
+    "input",
+    renderMarket
+);
+
+
+document.getElementById(
+    "refreshBtn"
+).addEventListener(
+    "click",
+    refreshPrices
+);
+
+
+
+// =====================================================
+// LOGOUT
+// =====================================================
+
+function logout() {
+
+    localStorage.removeItem(
+        "agrilink_token"
+    );
+
+    localStorage.removeItem(
+        "agrilink_role"
+    );
+
+    localStorage.removeItem(
+        "agrilink_user"
+    );
+
+    localStorage.removeItem(
+        "agrilink_email"
+    );
+
+    localStorage.removeItem(
+        "agrilink_user_id"
+    );
+
+
+    window.location.href =
+        "index.html";
+
+}
+
+
+
+// =====================================================
+// SECURITY HELPER
+// =====================================================
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+
+// =====================================================
+// START
+// =====================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        lucide.createIcons();
+
+        renderMarket();
+
+    }
+);
+
+</script>
+
+</body>
+</html>

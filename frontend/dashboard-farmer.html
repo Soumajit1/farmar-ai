@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Farmer Dashboard — AgriLink AI</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .loading-text {
+        color: var(--text-muted);
+        padding: 15px 0;
+        text-align: center;
+    }
+
+    .empty-text {
+        color: var(--text-muted);
+        padding: 15px 0;
+        text-align: center;
+    }
+
+    .produce-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 12px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+    }
+
+    .produce-left {
+        min-width: 0;
+    }
+
+    .produce-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .produce-quantity {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
+    .produce-right {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .produce-price {
+        color: var(--color-primary);
+        font-weight: 600;
+    }
+
+    .produce-status {
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    .status-available {
+        color: #2e7d32;
+    }
+
+    .status-pending {
+        color: #f39c12;
+    }
+
+    .status-sold {
+        color: #777;
+    }
+
+    .stat-loading {
+        opacity: 0.6;
+    }
+
+    .dashboard-error {
+        display: none;
+        margin-bottom: 20px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        background: #ffeaea;
+        color: #b71c1c;
+        border: 1px solid #ffcdd2;
+    }
+
+    .quick-action {
+        width: 100%;
+        margin-top: 8px;
+        cursor: pointer;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i data-lucide="tractor"></i>
+                AgriLink AI
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+
+            <a href="dashboard-farmer.html"
+               class="nav-item active">
+                Overview
+            </a>
+
+            <a href="farmer-market-prices.html"
+               class="nav-item">
+                Market Prices
+            </a>
+
+            <a href="farmer-produce.html"
+               class="nav-item">
+                My Produce
+            </a>
+
+            <a href="farmer-offers.html"
+               class="nav-item">
+                Buyer Offers
+            </a>
+
+            <a href="farmer-transactions.html"
+               class="nav-item">
+                Transactions
+            </a>
+
+            <a href="farmer-logistics.html"
+               class="nav-item">
+                Logistics
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+
+            <a href="#"
+               onclick="logout()"
+               class="nav-item"
+               style="color:#e74c3c;padding:0;">
+                Log Out
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar glass-panel">
+
+            <h2 class="page-title">
+                Overview
+            </h2>
+
+            <div class="topbar-actions">
+
+                <button
+                    id="notifBtn"
+                    class="btn-secondary"
+                    style="padding:8px 16px;display:flex;align-items:center;gap:8px;"
+                >
+                    <i data-lucide="bell"
+                       style="width:16px;height:16px;">
+                    </i>
+
+                    Notifications
+                </button>
+
+                <div class="user-profile">
+
+                    <div class="avatar"
+                         id="userAvatar">
+                        F
+                    </div>
+
+                    <span id="userName"
+                          style="font-weight:500;">
+                        Farmer User
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- DASHBOARD -->
+        <div class="dashboard-container fade-in">
+
+            <!-- ERROR -->
+            <div id="dashboardError"
+                 class="dashboard-error">
+                Unable to load dashboard data.
+            </div>
+
+
+            <!-- WELCOME -->
+            <div style="margin-bottom:32px;">
+
+                <h1 style="font-size:28px;margin-bottom:8px;">
+
+                    Welcome back,
+
+                    <span id="welcomeName">
+                        Farmer
+                    </span>!
+
+                </h1>
+
+                <p style="color:var(--text-muted);">
+
+                    Here is what's happening in your farm business today.
+
+                </p>
+
+            </div>
+
+
+            <!-- STAT CARDS -->
+            <div class="grid-cards">
+
+
+                <!-- TOTAL EARNINGS -->
+                <div class="card-3d stat-card">
+
+                    <div class="stat-header">
+
+                        <span>
+                            Total Earnings
+                        </span>
+
+                        <span class="trend-up">
+                            Earnings
+                        </span>
+
+                    </div>
+
+                    <div
+                        id="totalEarnings"
+                        class="stat-value stat-loading"
+                    >
+                        ₹0
+                    </div>
+
+                </div>
+
+
+                <!-- ACTIVE OFFERS -->
+                <div class="card-3d stat-card">
+
+                    <div class="stat-header">
+
+                        <span>
+                            Active Offers
+                        </span>
+
+                        <span class="trend-up">
+                            Buyer Interest
+                        </span>
+
+                    </div>
+
+                    <div
+                        id="activeOffers"
+                        class="stat-value stat-loading"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+                <!-- PENDING TRANSACTIONS -->
+                <div class="card-3d stat-card">
+
+                    <div class="stat-header">
+
+                        <span>
+                            Pending Transactions
+                        </span>
+
+                        <span style="color:#f39c12;">
+                            Action Required
+                        </span>
+
+                    </div>
+
+                    <div
+                        id="pendingTransactions"
+                        class="stat-value stat-loading"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCE COUNT -->
+            <div style="margin-top:20px;">
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-header">
+
+                        <span>
+                            My Produce
+                        </span>
+
+                        <span class="trend-up">
+                            Listings
+                        </span>
+
+                    </div>
+
+                    <div
+                        id="produceCount"
+                        class="stat-value stat-loading"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- AI MARKET INTELLIGENCE -->
+            <div
+                class="dashboard-section ai-highlight glass-panel-dark"
+                style="margin-top:24px;"
+            >
+
+                <div
+                    class="section-title"
+                    style="margin-bottom:12px;display:flex;align-items:center;gap:8px;"
+                >
+
+                    <i data-lucide="bot"></i>
+
+                    <span>
+                        AI Market Intelligence
+                    </span>
+
+                    <button
+                        onclick="openMarketPrices()"
+                        class="btn-primary"
+                        style="font-size:13px;padding:8px 16px;margin-left:auto;"
+                    >
+                        View Market
+                    </button>
+
+                </div>
+
+
+                <div
+                    style="display:flex;gap:24px;flex-wrap:wrap;"
+                >
+
+                    <div
+                        style="
+                            flex:1;
+                            min-width:200px;
+                            background:rgba(255,255,255,0.1);
+                            padding:16px;
+                            border-radius:8px;
+                        "
+                    >
+
+                        <p
+                            style="font-weight:600;margin-bottom:8px;"
+                        >
+                            Market Prices
+                        </p>
+
+                        <p
+                            style="font-size:14px;opacity:0.9;"
+                        >
+                            Check current crop prices and compare
+                            market rates before listing your produce.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        style="
+                            flex:1;
+                            min-width:200px;
+                            background:rgba(255,255,255,0.1);
+                            padding:16px;
+                            border-radius:8px;
+                        "
+                    >
+
+                        <p
+                            style="font-weight:600;margin-bottom:8px;"
+                        >
+                            Buyer Demand
+                        </p>
+
+                        <p
+                            style="font-size:14px;opacity:0.9;"
+                        >
+                            Track buyer offers and respond to
+                            opportunities for your listed produce.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CHART + PRODUCE -->
+            <div
+                style="
+                    display:flex;
+                    gap:24px;
+                    flex-wrap:wrap;
+                    margin-top:24px;
+                "
+            >
+
+
+                <!-- CHART -->
+                <div
+                    class="dashboard-section card-3d"
+                    style="flex:2;min-width:300px;"
+                >
+
+                    <div class="section-title">
+                        Market Price Trends (₹/Quintal)
+                    </div>
+
+                    <canvas
+                        id="priceChart"
+                        height="200"
+                    ></canvas>
+
+                </div>
+
+
+                <!-- MY PRODUCE -->
+                <div
+                    class="dashboard-section card-3d"
+                    style="flex:1;min-width:250px;"
+                >
+
+                    <div class="section-title">
+                        My Produce
+                    </div>
+
+                    <div
+                        id="produceList"
+                        style="
+                            display:flex;
+                            flex-direction:column;
+                            gap:12px;
+                        "
+                    >
+
+                        <div class="loading-text">
+                            Loading produce...
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        onclick="openProduce()"
+                        class="btn-secondary quick-action"
+                    >
+                        + Manage Produce
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT ACTIVITY -->
+            <div
+                class="dashboard-section card-3d"
+                style="margin-top:24px;"
+            >
+
+                <div class="section-title">
+                    Recent Activity
+                </div>
+
+
+                <div id="recentActivity">
+
+                    <div class="loading-text">
+                        Loading recent activity...
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+const API_BASE = "http://localhost:5000";
+
+
+// =====================================================
+// GET LOGGED-IN FARMER
+// =====================================================
+
+const farmerId =
+    localStorage.getItem("agrilink_user_id");
+
+const storedUser =
+    localStorage.getItem("agrilink_user") || "Farmer";
+
+const storedRole =
+    localStorage.getItem("agrilink_role");
+
+
+// =====================================================
+// AUTH CHECK
+// =====================================================
+
+if (!farmerId || storedRole !== "farmer") {
+
+    alert("Please login as a farmer.");
+
+    window.location.href = "index.html";
+
+}
+
+
+// =====================================================
+// USER DISPLAY
+// =====================================================
+
+document.getElementById("userName").textContent =
+    storedUser;
+
+document.getElementById("welcomeName").textContent =
+    storedUser;
+
+document.getElementById("userAvatar").textContent =
+    storedUser.charAt(0).toUpperCase();
+
+
+// =====================================================
+// LOAD FARMER DASHBOARD
+// =====================================================
+
+async function loadDashboard() {
+
+    const errorBox =
+        document.getElementById("dashboardError");
+
+    try {
+
+        errorBox.style.display = "none";
+
+
+        const response = await fetch(
+            `${API_BASE}/api/farmer/overview?userId=${encodeURIComponent(farmerId)}`
+        );
+
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error || "Failed to load dashboard"
+            );
+
+        }
+
+
+        console.log("Farmer dashboard data:", data);
+
+
+        // -------------------------------------------------
+        // FARMER INFORMATION
+        // -------------------------------------------------
+
+        if (data.farmer) {
+
+            const farmerName =
+                data.farmer.name || storedUser;
+
+            document.getElementById("userName")
+                .textContent = farmerName;
+
+            document.getElementById("welcomeName")
+                .textContent = farmerName;
+
+            document.getElementById("userAvatar")
+                .textContent =
+                farmerName.charAt(0).toUpperCase();
+
+        }
+
+
+        // -------------------------------------------------
+        // STATISTICS
+        // -------------------------------------------------
+
+        const stats =
+            data.statistics || {};
+
+
+        document.getElementById("totalEarnings")
+            .textContent =
+            formatCurrency(
+                stats.totalEarnings || 0
+            );
+
+
+        document.getElementById("activeOffers")
+            .textContent =
+            Number(
+                stats.activeOffers || 0
+            );
+
+
+        document.getElementById("pendingTransactions")
+            .textContent =
+            Number(
+                stats.pendingTransactions || 0
+            );
+
+
+        document.getElementById("produceCount")
+            .textContent =
+            Number(
+                stats.produceCount ||
+                (data.recentProduce || []).length ||
+                0
+            );
+
+
+        // remove loading appearance
+
+        document.getElementById("totalEarnings")
+            .classList.remove("stat-loading");
+
+        document.getElementById("activeOffers")
+            .classList.remove("stat-loading");
+
+        document.getElementById("pendingTransactions")
+            .classList.remove("stat-loading");
+
+        document.getElementById("produceCount")
+            .classList.remove("stat-loading");
+
+
+        // -------------------------------------------------
+        // PRODUCE
+        // -------------------------------------------------
+
+        renderProduce(
+            data.recentProduce || []
+        );
+
+
+        // -------------------------------------------------
+        // RECENT ACTIVITY
+        // -------------------------------------------------
+
+        renderRecentActivity(data);
+
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
+        errorBox.textContent =
+            "Unable to load dashboard data. Make sure the backend is running.";
+
+        errorBox.style.display = "block";
+
+
+        document.getElementById("produceList")
+            .innerHTML = `
+                <div class="empty-text">
+                    Unable to load produce.
+                </div>
+            `;
+
+
+        document.getElementById("recentActivity")
+            .innerHTML = `
+                <div class="empty-text">
+                    Unable to load recent activity.
+                </div>
+            `;
+
+    }
+
+}
+
+
+// =====================================================
+// FORMAT CURRENCY
+// =====================================================
+
+function formatCurrency(value) {
+
+    const number =
+        Number(value) || 0;
+
+    return "₹" +
+        number.toLocaleString("en-IN", {
+            maximumFractionDigits: 2
+        });
+
+}
+
+
+// =====================================================
+// RENDER PRODUCE
+// =====================================================
+
+function renderProduce(produce) {
+
+    const container =
+        document.getElementById("produceList");
+
+
+    if (!produce || produce.length === 0) {
+
+        container.innerHTML = `
+            <div class="empty-text">
+                No produce listed yet.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        produce.slice(0, 5).map(item => {
+
+            const crop =
+                item.crop_name || "Unknown Crop";
+
+            const quantity =
+                Number(item.quantity || 0);
+
+            const unit =
+                item.unit || "kg";
+
+            const price =
+                item.price_per_unit;
+
+
+            const status =
+                String(
+                    item.status || "available"
+                ).toLowerCase();
+
+
+            let statusClass =
+                "status-available";
+
+
+            if (status === "pending") {
+
+                statusClass =
+                    "status-pending";
+
+            }
+
+
+            if (status === "sold") {
+
+                statusClass =
+                    "status-sold";
+
+            }
+
+
+            const priceText =
+                price !== null &&
+                price !== undefined &&
+                price !== ""
+                    ? formatCurrency(price) + "/" + unit
+                    : "---";
+
+
+            return `
+
+                <div class="produce-item">
+
+                    <div class="produce-left">
+
+                        <div class="produce-name">
+                            ${escapeHtml(crop)}
+                        </div>
+
+                        <div class="produce-quantity">
+                            ${quantity} ${escapeHtml(unit)}
+                        </div>
+
+                    </div>
+
+
+                    <div class="produce-right">
+
+                        <div class="produce-price">
+                            ${priceText}
+                        </div>
+
+                        <div class="produce-status ${statusClass}">
+                            ${capitalize(status)}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+}
+
+
+// =====================================================
+// RECENT ACTIVITY
+// =====================================================
+
+function renderRecentActivity(data) {
+
+    const container =
+        document.getElementById("recentActivity");
+
+
+    const produce =
+        data.recentProduce || [];
+
+    const offers =
+        data.recentOffers || [];
+
+    const transactions =
+        data.recentTransactions || [];
+
+
+    const activities = [];
+
+
+    // Produce activity
+
+    produce.slice(0, 3).forEach(item => {
+
+        activities.push({
+
+            date: item.created_at,
+
+            text:
+                `Added ${item.crop_name} to produce listings.`
+
+        });
+
+    });
+
+
+    // Offer activity
+
+    offers.slice(0, 3).forEach(item => {
+
+        activities.push({
+
+            date:
+                item.created_at ||
+                item.updated_at,
+
+            text:
+                "New buyer offer received."
+
+        });
+
+    });
+
+
+    // Transaction activity
+
+    transactions.slice(0, 3).forEach(item => {
+
+        activities.push({
+
+            date:
+                item.created_at ||
+                item.updated_at,
+
+            text:
+                "Transaction activity recorded."
+
+        });
+
+    });
+
+
+    if (activities.length === 0) {
+
+        container.innerHTML = `
+            <div class="empty-text">
+                No recent activity.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    activities
+        .sort((a, b) => {
+
+            const dateA =
+                new Date(a.date || 0);
+
+            const dateB =
+                new Date(b.date || 0);
+
+            return dateB - dateA;
+
+        })
+        .slice(0, 6)
+        .forEach(activity => {
+
+            const div =
+                document.createElement("div");
+
+            div.style.padding = "12px 0";
+            div.style.borderBottom =
+                "1px solid #eee";
+
+            div.innerHTML = `
+
+                <div style="font-weight:500;">
+                    ${escapeHtml(activity.text)}
+                </div>
+
+                <div
+                    style="
+                        font-size:12px;
+                        color:var(--text-muted);
+                        margin-top:4px;
+                    "
+                >
+                    ${formatDate(activity.date)}
+                </div>
+
+            `;
+
+            container.appendChild(div);
+
+        });
+
+}
+
+
+// =====================================================
+// CHART
+// =====================================================
+
+function createPriceChart() {
+
+    const canvas =
+        document.getElementById("priceChart");
+
+
+    if (!canvas) return;
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    new Chart(ctx, {
+
+        type: "line",
+
+        data: {
+
+            labels: [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+
+            datasets: [
+
+                {
+
+                    label: "Wheat",
+
+                    data: [
+                        2100,
+                        2150,
+                        2140,
+                        2180,
+                        2200,
+                        2250,
+                        2240
+                    ],
+
+                    borderColor: "#1b5e20",
+
+                    backgroundColor:
+                        "rgba(27,94,32,0.1)",
+
+                    fill: true,
+
+                    tension: 0.4
+
+                },
+
+
+                {
+
+                    label: "Rice",
+
+                    data: [
+                        3500,
+                        3500,
+                        3550,
+                        3520,
+                        3600,
+                        3650,
+                        3620
+                    ],
+
+                    borderColor: "#00bfa5",
+
+                    backgroundColor:
+                        "rgba(0,191,165,0.1)",
+
+                    fill: true,
+
+                    tension: 0.4
+
+                }
+
+            ]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            plugins: {
+
+                legend: {
+                    position: "top"
+                }
+
+            },
+
+            scales: {
+
+                y: {
+                    beginAtZero: false
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+
+// =====================================================
+// NAVIGATION
+// =====================================================
+
+function openProduce() {
+
+    window.location.href =
+        "farmer-produce.html";
+
+}
+
+
+function openMarketPrices() {
+
+    window.location.href =
+        "farmer-market-prices.html";
+
+}
+
+
+// =====================================================
+// LOGOUT
+// =====================================================
+
+function logout() {
+
+    localStorage.removeItem(
+        "agrilink_token"
+    );
+
+    localStorage.removeItem(
+        "agrilink_role"
+    );
+
+    localStorage.removeItem(
+        "agrilink_user"
+    );
+
+    localStorage.removeItem(
+        "agrilink_email"
+    );
+
+    localStorage.removeItem(
+        "agrilink_user_id"
+    );
+
+
+    window.location.href =
+        "index.html";
+
+}
+
+
+// =====================================================
+// HELPERS
+// =====================================================
+
+function capitalize(value) {
+
+    if (!value) return "";
+
+    return value.charAt(0).toUpperCase() +
+        value.slice(1);
+
+}
+
+
+function formatDate(value) {
+
+    if (!value) return "Recently";
+
+
+    const date =
+        new Date(value);
+
+
+    if (isNaN(date.getTime())) {
+
+        return "Recently";
+
+    }
+
+
+    return date.toLocaleDateString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }
+    );
+
+}
+
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// =====================================================
+// START
+// =====================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        lucide.createIcons();
+
+        createPriceChart();
+
+        loadDashboard();
+
+    }
+);
+
+</script>
+
+</body>
+</html>

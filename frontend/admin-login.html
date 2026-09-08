@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AgriLink AI — Admin Portal</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        .admin-login-page {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eafbe7,
+                    #d4f1c5
+                );
+
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-login-page::before {
+            content: '';
+
+            position: absolute;
+            inset: 0;
+
+            background-image:
+                radial-gradient(
+                    var(--color-primary-light) 1px,
+                    transparent 1px
+                );
+
+            background-size: 30px 30px;
+
+            opacity: 0.1;
+        }
+
+        .login-card-container {
+            width: 100%;
+            max-width: 420px;
+
+            padding: 0 24px;
+
+            z-index: 1;
+        }
+
+        .admin-card {
+            background: rgba(255, 255, 255, 0.9);
+
+            backdrop-filter: blur(20px);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.4);
+
+            box-shadow: var(--shadow-lg);
+
+            padding: 40px 32px;
+
+            border-radius:
+                var(--border-radius-md);
+        }
+
+        .admin-title {
+            font-size: 24px;
+
+            font-family:
+                'Outfit',
+                sans-serif;
+
+            margin-bottom: 24px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            color:
+                var(--color-secondary);
+
+            font-weight: 700;
+        }
+
+        .back-link {
+            position: absolute;
+
+            top: 24px;
+            left: 40px;
+
+            color:
+                var(--text-muted);
+
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            font-size: 14px;
+
+            font-weight: 500;
+
+            z-index: 2;
+        }
+
+        .back-link:hover {
+            color:
+                var(--color-primary);
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="admin-login-page">
+
+    <a
+        href="index.html"
+        class="back-link"
+    >
+        <i
+            data-lucide="arrow-left"
+            style="
+                width:16px;
+                height:16px;
+            "
+        ></i>
+
+        Back to Main Portal
+    </a>
+
+
+    <div
+        class="login-card-container fade-in"
+    >
+
+        <div
+            class="admin-card card-3d"
+        >
+
+            <div class="admin-title">
+
+                <i
+                    data-lucide="shield-check"
+                    style="
+                        color:var(--color-primary);
+                        width:28px;
+                        height:28px;
+                    "
+                ></i>
+
+                Admin Portal
+
+            </div>
+
+
+            <p
+                style="
+                    color:var(--text-muted);
+                    margin-bottom:32px;
+                    font-size:14px;
+                "
+            >
+                Secure access for system administrators only.
+            </p>
+
+
+            <form id="adminLoginForm">
+
+
+                <div class="input-group">
+
+                    <label for="adminId">
+                        Admin Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="adminId"
+                        placeholder="Enter admin email"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <p
+                    class="error-msg"
+                    id="errorMsg"
+                    style="margin-bottom:16px;"
+                ></p>
+
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="btn-primary"
+                    style="width:100%;"
+                >
+
+                    <i
+                        data-lucide="lock"
+                        style="
+                            width:16px;
+                            height:16px;
+                        "
+                    ></i>
+
+                    Authenticate
+
+                </button>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        lucide.createIcons();
+
+
+        const form =
+            document.getElementById(
+                'adminLoginForm'
+            );
+
+
+        const errorMsg =
+            document.getElementById(
+                'errorMsg'
+            );
+
+
+        const loginButton =
+            document.getElementById(
+                'loginButton'
+            );
+
+
+        form.addEventListener(
+            'submit',
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const email =
+                    document
+                        .getElementById('adminId')
+                        .value
+                        .trim();
+
+
+                const password =
+                    document
+                        .getElementById('password')
+                        .value;
+
+
+                errorMsg.textContent = '';
+
+
+                if (!email || !password) {
+
+                    errorMsg.textContent =
+                        'Please enter admin email and password.';
+
+                    return;
+                }
+
+
+                loginButton.disabled = true;
+
+                loginButton.innerHTML =
+                    `
+                    <i
+                        data-lucide="loader-circle"
+                        class="animate-spin"
+                        style="
+                            width:16px;
+                            height:16px;
+                        "
+                    ></i>
+
+                    Authenticating...
+                    `;
+
+                loginButton.style.opacity = '0.8';
+
+                lucide.createIcons();
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            'http://localhost:5000/api/auth/login',
+                            {
+                                method: 'POST',
+
+                                headers: {
+                                    'Content-Type':
+                                        'application/json'
+                                },
+
+                                body: JSON.stringify({
+
+                                    /*
+                                     * IMPORTANT:
+                                     * Backend expects "identifier",
+                                     * not "email".
+                                     */
+                                    identifier: email,
+
+                                    password: password,
+
+                                    role: 'admin'
+                                })
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    console.log(
+                        'Admin login response:',
+                        data
+                    );
+
+
+                    if (!response.ok) {
+
+                        errorMsg.textContent =
+                            data.message ||
+                            'Invalid admin credentials.';
+
+                        return;
+                    }
+
+
+                    if (
+                        !data.user ||
+                        data.user.role !== 'admin'
+                    ) {
+
+                        errorMsg.textContent =
+                            'This account is not an administrator.';
+
+                        return;
+                    }
+
+
+                    /*
+                     * Save authentication information
+                     */
+                    localStorage.setItem(
+                        'agrilink_token',
+                        data.token
+                    );
+
+
+                    localStorage.setItem(
+                        'agrilink_role',
+                        'admin'
+                    );
+
+
+                    localStorage.setItem(
+                        'agrilink_user',
+                        data.user.name
+                    );
+
+
+                    localStorage.setItem(
+                        'agrilink_user_id',
+                        String(data.user.id)
+                    );
+
+
+                    localStorage.setItem(
+                        'agrilink_email',
+                        data.user.email
+                    );
+
+
+                    /*
+                     * Redirect to admin dashboard
+                     */
+                    window.location.href =
+                        'dashboard-admin.html';
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        'Admin login error:',
+                        error
+                    );
+
+
+                    errorMsg.textContent =
+                        'Unable to connect to backend. Make sure the server is running.';
+                }
+
+                finally {
+
+                    loginButton.disabled = false;
+
+                    loginButton.style.opacity = '1';
+
+                    loginButton.innerHTML =
+                        `
+                        <i
+                            data-lucide="lock"
+                            style="
+                                width:16px;
+                                height:16px;
+                            "
+                        ></i>
+
+                        Authenticate
+                        `;
+
+                    lucide.createIcons();
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>

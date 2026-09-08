@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Buyer Dashboard — AgriLink AI</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboards.css">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        .dashboard-section {
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            padding: 20px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .marketplace-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .marketplace-header h2 {
+            margin: 0;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-row input,
+        .filter-row select {
+            padding: 9px 12px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: white;
+        }
+
+        .marketplace-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .produce-card {
+            padding: 20px;
+        }
+
+        .produce-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .produce-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            text-transform: capitalize;
+        }
+
+        .produce-meta {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .price {
+            font-size: 25px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin: 18px 0;
+        }
+
+        .price span {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .farmer-info {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .small-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            padding: 50px 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            width: 45px;
+            height: 45px;
+            margin-bottom: 12px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-accepted {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-heading h3 {
+            margin: 0;
+        }
+
+        .refresh-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .loading {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .error-box {
+            padding: 16px;
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .quick-action {
+            padding: 18px;
+            text-decoration: none;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        .quick-action i {
+            width: 28px;
+            height: 28px;
+            margin-bottom: 8px;
+            color: var(--color-primary);
+        }
+
+        .quick-action div {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        @media (max-width: 1000px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .marketplace-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 650px) {
+            .stats-grid,
+            .marketplace-grid,
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar-actions {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i data-lucide="tractor"></i>
+                AgriLink AI
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+
+            <a
+                href="dashboard-buyer.html"
+                class="nav-item active"
+            >
+                Overview
+            </a>
+
+            <a
+                href="#marketplace"
+                class="nav-item"
+                onclick="showMarketplace()"
+            >
+                Marketplace
+            </a>
+
+            <a
+                href="buyer-offers.html"
+                class="nav-item"
+            >
+                My Offers
+            </a>
+
+            <a
+                href="buyer-transactions.html"
+                class="nav-item"
+            >
+                Transactions
+            </a>
+
+            <a
+                href="buyer-logistics.html"
+                class="nav-item"
+            >
+                Logistics
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+
+            <a
+                href="#"
+                class="nav-item"
+                style="color:#e74c3c; padding:0;"
+                onclick="logout()"
+            >
+                Log Out
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================================================= -->
+    <!-- MAIN CONTENT -->
+    <!-- ================================================= -->
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar glass-panel">
+
+            <h2 class="page-title">
+                Buyer Dashboard
+            </h2>
+
+            <div class="topbar-actions">
+
+                <div
+                    class="input-group"
+                    style="margin-bottom:0; width:250px;"
+                >
+                    <input
+                        type="text"
+                        id="globalSearch"
+                        placeholder="Search produce, farmers..."
+                        style="padding:8px 12px;"
+                    >
+                </div>
+
+                <button
+                    class="btn-secondary"
+                    style="
+                        padding:8px 12px;
+                        display:flex;
+                        align-items:center;
+                    "
+                    onclick="loadDashboard()"
+                >
+                    <i
+                        data-lucide="refresh-cw"
+                        style="width:16px;height:16px;"
+                    ></i>
+                </button>
+
+                <div class="user-profile">
+
+                    <div
+                        class="avatar"
+                        id="userAvatar"
+                    >
+                        B
+                    </div>
+
+                    <span
+                        id="userName"
+                        style="font-weight:500;"
+                    >
+                        Buyer
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="dashboard-container fade-in">
+
+            <!-- ERROR -->
+
+            <div
+                id="errorBox"
+                class="error-box"
+            ></div>
+
+
+            <!-- ================================================= -->
+            <!-- WELCOME -->
+            <!-- ================================================= -->
+
+            <div
+                class="dashboard-section glass-panel"
+                style="padding:24px;"
+            >
+
+                <h2 style="margin-bottom:6px;">
+                    Welcome,
+                    <span id="welcomeName">
+                        Buyer
+                    </span>
+                </h2>
+
+                <p style="color:var(--text-muted);">
+                    Browse available agricultural produce
+                    and connect directly with farmers.
+                </p>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- STATISTICS -->
+            <!-- ================================================= -->
+
+            <div class="stats-grid">
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-label">
+                        Available Produce
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="availableProduce"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-label">
+                        My Offers
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="totalOffers"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-label">
+                        Pending Offers
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="pendingOffers"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-label">
+                        Completed Purchases
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="completedTransactions"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- QUICK ACTIONS -->
+            <!-- ================================================= -->
+
+            <div
+                class="dashboard-section"
+                style="margin-bottom:24px;"
+            >
+
+                <div class="quick-actions">
+
+                    <a
+                        href="#marketplace"
+                        class="card-3d quick-action"
+                        onclick="showMarketplace()"
+                    >
+                        <i data-lucide="store"></i>
+                        <div>
+                            Browse Produce
+                        </div>
+                    </a>
+
+                    <a
+                        href="buyer-offers.html"
+                        class="card-3d quick-action"
+                    >
+                        <i data-lucide="hand-coins"></i>
+                        <div>
+                            My Offers
+                        </div>
+                    </a>
+
+                    <a
+                        href="buyer-transactions.html"
+                        class="card-3d quick-action"
+                    >
+                        <i data-lucide="receipt"></i>
+                        <div>
+                            Transactions
+                        </div>
+                    </a>
+
+                    <a
+                        href="buyer-logistics.html"
+                        class="card-3d quick-action"
+                    >
+                        <i data-lucide="truck"></i>
+                        <div>
+                            Logistics
+                        </div>
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- MARKETPLACE -->
+            <!-- ================================================= -->
+
+            <div
+                id="marketplace"
+                class="dashboard-section glass-panel"
+            >
+
+                <div class="marketplace-header">
+
+                    <div>
+                        <h2>
+                            Marketplace
+                        </h2>
+
+                        <p
+                            style="
+                                color:var(--text-muted);
+                                font-size:13px;
+                                margin-top:4px;
+                            "
+                        >
+                            Available produce from farmers
+                        </p>
+                    </div>
+
+
+                    <div class="filter-row">
+
+                        <input
+                            type="text"
+                            id="produceSearch"
+                            placeholder="Search crop or farmer..."
+                        >
+
+                        <select id="qualityFilter">
+
+                            <option value="">
+                                All Quality
+                            </option>
+
+                            <option value="A">
+                                Grade A
+                            </option>
+
+                            <option value="B">
+                                Grade B
+                            </option>
+
+                            <option value="C">
+                                Grade C
+                            </option>
+
+                        </select>
+
+                        <select id="sortFilter">
+
+                            <option value="latest">
+                                Latest
+                            </option>
+
+                            <option value="price-low">
+                                Price: Low to High
+                            </option>
+
+                            <option value="price-high">
+                                Price: High to Low
+                            </option>
+
+                            <option value="quantity-high">
+                                Quantity: High to Low
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="marketplaceLoading"
+                    class="loading"
+                >
+                    Loading available produce...
+                </div>
+
+
+                <div
+                    id="marketplaceGrid"
+                    class="marketplace-grid"
+                    style="display:none;"
+                ></div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- RECENT OFFERS -->
+            <!-- ================================================= -->
+
+            <div
+                class="dashboard-section glass-panel"
+            >
+
+                <div class="section-heading">
+
+                    <h3>
+                        Recent Offers
+                    </h3>
+
+                    <a
+                        href="buyer-offers.html"
+                        class="btn-secondary"
+                        style="
+                            padding:7px 12px;
+                            text-decoration:none;
+                        "
+                    >
+                        View All
+                    </a>
+
+                </div>
+
+
+                <div
+                    id="offersContainer"
+                ></div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- RECENT TRANSACTIONS -->
+            <!-- ================================================= -->
+
+            <div
+                class="dashboard-section glass-panel"
+            >
+
+                <div class="section-heading">
+
+                    <h3>
+                        Recent Transactions
+                    </h3>
+
+                    <a
+                        href="buyer-transactions.html"
+                        class="btn-secondary"
+                        style="
+                            padding:7px 12px;
+                            text-decoration:none;
+                        "
+                    >
+                        View All
+                    </a>
+
+                </div>
+
+
+                <div
+                    id="transactionsContainer"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+const API_BASE =
+    'http://localhost:5000';
+
+
+// =====================================================
+// BUYER ID
+// =====================================================
+
+let buyerId = null;
+
+try {
+
+    buyerId =
+        Number(
+            localStorage.getItem(
+                'agrilink_user_id'
+            )
+        );
+
+} catch (error) {
+
+    buyerId = null;
+
+}
+
+
+// =====================================================
+// FALLBACK FOR CURRENT TEST BUYER
+// =====================================================
+
+if (
+    !Number.isInteger(buyerId) ||
+    buyerId <= 0
+) {
+
+    buyerId = 5;
+
+}
+
+
+// =====================================================
+// DATA
+// =====================================================
+
+let dashboardData = null;
+
+
+// =====================================================
+// LOAD DASHBOARD
+// =====================================================
+
+async function loadDashboard() {
+
+    const errorBox =
+        document.getElementById(
+            'errorBox'
+        );
+
+    errorBox.style.display =
+        'none';
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/buyer/overview?userId=${buyerId}`
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                'Failed to load buyer dashboard'
+            );
+
+        }
+
+        dashboardData = data;
+
+        renderBuyer(data);
+
+        renderMarketplace(
+            data.recentProduce || []
+        );
+
+        renderOffers(
+            data.recentOffers || []
+        );
+
+        renderTransactions(
+            data.recentTransactions || []
+        );
+
+    } catch (error) {
+
+        console.error(
+            'Buyer dashboard error:',
+            error
+        );
+
+        errorBox.textContent =
+            error.message;
+
+        errorBox.style.display =
+            'block';
+
+    }
+
+}
+
+
+// =====================================================
+// RENDER BUYER
+// =====================================================
+
+function renderBuyer(data) {
+
+    const buyer =
+        data.buyer || {};
+
+    const stats =
+        data.statistics || {};
+
+
+    const name =
+        buyer.name ||
+        'Buyer';
+
+
+    document.getElementById(
+        'userName'
+    ).textContent =
+        name;
+
+
+    document.getElementById(
+        'welcomeName'
+    ).textContent =
+        name;
+
+
+    document.getElementById(
+        'userAvatar'
+    ).textContent =
+        name
+            .charAt(0)
+            .toUpperCase();
+
+
+    document.getElementById(
+        'availableProduce'
+    ).textContent =
+        stats.availableProduce || 0;
+
+
+    document.getElementById(
+        'totalOffers'
+    ).textContent =
+        stats.totalOffers || 0;
+
+
+    document.getElementById(
+        'pendingOffers'
+    ).textContent =
+        stats.pendingOffers || 0;
+
+
+    document.getElementById(
+        'completedTransactions'
+    ).textContent =
+        stats.completedTransactions || 0;
+
+}
+
+
+// =====================================================
+// RENDER MARKETPLACE
+// =====================================================
+
+function renderMarketplace(
+    produce
+) {
+
+    const loading =
+        document.getElementById(
+            'marketplaceLoading'
+        );
+
+    const grid =
+        document.getElementById(
+            'marketplaceGrid'
+        );
+
+
+    loading.style.display =
+        'none';
+
+    grid.style.display =
+        'grid';
+
+
+    if (
+        !produce ||
+        produce.length === 0
+    ) {
+
+        grid.innerHTML = `
+
+            <div
+                class="empty-state"
+                style="grid-column:1/-1;"
+            >
+
+                <i data-lucide="package-open"></i>
+
+                <h3>
+                    No produce available
+                </h3>
+
+                <p>
+                    There are currently no available
+                    produce listings.
+                </p>
+
+            </div>
+
+        `;
+
+        lucide.createIcons();
+
+        return;
+
+    }
+
+
+    drawMarketplaceCards(
+        produce
+    );
+
+}
+
+
+// =====================================================
+// DRAW MARKETPLACE CARDS
+// =====================================================
+
+function drawMarketplaceCards(
+    produce
+) {
+
+    const grid =
+        document.getElementById(
+            'marketplaceGrid'
+        );
+
+
+    grid.innerHTML =
+        produce
+            .map(
+                item => {
+
+                    const farmerName =
+                        item.farmer_name ||
+                        'Farmer';
+
+
+                    const price =
+                        Number(
+                            item.price_per_unit ||
+                            0
+                        );
+
+
+                    const quantity =
+                        Number(
+                            item.quantity ||
+                            0
+                        );
+
+
+                    return `
+
+                        <div
+                            class="card-3d produce-card"
+                            data-crop="${escapeHtml(item.crop_name)}"
+                            data-farmer="${escapeHtml(farmerName)}"
+                            data-quality="${escapeHtml(item.quality || '')}"
+                        >
+
+                            <div class="produce-top">
+
+                                <div>
+
+                                    <div class="produce-name">
+                                        ${escapeHtml(
+                                            item.crop_name
+                                        )}
+                                    </div>
+
+                                    <div class="produce-meta">
+                                        ${escapeHtml(
+                                            item.quality ||
+                                            'Quality not specified'
+                                        )}
+                                        •
+                                        ${quantity.toFixed(2)}
+                                        ${escapeHtml(
+                                            item.unit ||
+                                            'kg'
+                                        )}
+                                    </div>
+
+                                </div>
+
+                                <span
+                                    class="status-badge status-available"
+                                >
+                                    Available
+                                </span>
+
+                            </div>
+
+
+                            <div class="farmer-info">
+
+                                <div
+                                    class="small-avatar"
+                                >
+                                    ${escapeHtml(
+                                        farmerName
+                                            .charAt(0)
+                                            .toUpperCase()
+                                    )}
+                                </div>
+
+                                <span>
+                                    ${escapeHtml(
+                                        farmerName
+                                    )}
+                                </span>
+
+                            </div>
+
+
+                            <div class="price">
+
+                                ₹${price.toFixed(2)}
+
+                                <span>
+                                    /
+                                    ${escapeHtml(
+                                        item.unit ||
+                                        'kg'
+                                    )}
+                                </span>
+
+                            </div>
+
+
+                            ${
+                                item.description
+                                    ? `
+                                        <p
+                                            style="
+                                                color:var(--text-muted);
+                                                font-size:13px;
+                                                margin-bottom:16px;
+                                            "
+                                        >
+                                            ${escapeHtml(
+                                                item.description
+                                            )}
+                                        </p>
+                                    `
+                                    : ''
+                            }
+
+
+                            <button
+                                class="btn-primary"
+                                style="width:100%;"
+                                onclick="makeOffer(
+                                    ${Number(item.id)},
+                                    '${escapeJs(item.crop_name)}',
+                                    ${price},
+                                    ${quantity},
+                                    '${escapeJs(item.unit || 'kg')}'
+                                )"
+                            >
+                                Make Offer
+                            </button>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join('');
+
+
+    lucide.createIcons();
+
+}
+
+
+// =====================================================
+// MAKE OFFER
+// =====================================================
+
+function makeOffer(
+    produceId,
+    cropName,
+    listedPrice,
+    availableQuantity,
+    unit
+) {
+
+    const quantity =
+        prompt(
+            `Enter quantity in ${unit}:`
+        );
+
+
+    if (
+        quantity === null
+    ) {
+        return;
+    }
+
+
+    const qty =
+        Number(quantity);
+
+
+    if (
+        !Number.isFinite(qty) ||
+        qty <= 0
+    ) {
+
+        alert(
+            'Enter a valid quantity.'
+        );
+
+        return;
+
+    }
+
+
+    if (
+        qty > availableQuantity
+    ) {
+
+        alert(
+            `Only ${availableQuantity} ${unit} is available.`
+        );
+
+        return;
+
+    }
+
+
+    const offeredPrice =
+        prompt(
+            `Listed price: ₹${listedPrice}/${unit}\nEnter your offered price per ${unit}:`,
+            listedPrice
+        );
+
+
+    if (
+        offeredPrice === null
+    ) {
+        return;
+    }
+
+
+    const price =
+        Number(offeredPrice);
+
+
+    if (
+        !Number.isFinite(price) ||
+        price <= 0
+    ) {
+
+        alert(
+            'Enter a valid offer price.'
+        );
+
+        return;
+
+    }
+
+
+    const message =
+        prompt(
+            'Optional message to the farmer:'
+        );
+
+
+    submitOffer(
+        produceId,
+        qty,
+        price,
+        message || ''
+    );
+
+}
+
+
+// =====================================================
+// SUBMIT OFFER
+// =====================================================
+
+async function submitOffer(
+    produceId,
+    quantity,
+    offeredPrice,
+    message
+) {
+
+    /*
+     * Your offers table is already known:
+     *
+     * produce_id
+     * buyer_id
+     * offered_price
+     * quantity
+     * message
+     * status
+     *
+     * We need a buyer-offer POST route to actually
+     * insert the offer.
+     *
+     * This frontend checks the endpoint and gives
+     * a clear message if that route has not yet been
+     * implemented.
+     */
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/buyer/offers`,
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body: JSON.stringify({
+
+                        buyer_id:
+                            buyerId,
+
+                        produce_id:
+                            produceId,
+
+                        offered_price:
+                            offeredPrice,
+
+                        quantity:
+                            quantity,
+
+                        message:
+                            message
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                'Unable to submit offer'
+            );
+
+        }
+
+
+        alert(
+            'Offer submitted successfully.'
+        );
+
+
+        loadDashboard();
+
+    } catch (error) {
+
+        console.error(
+            'Offer submission error:',
+            error
+        );
+
+
+        alert(
+            'Offer could not be submitted: ' +
+            error.message
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// RENDER OFFERS
+// =====================================================
+
+function renderOffers(
+    offers
+) {
+
+    const container =
+        document.getElementById(
+            'offersContainer'
+        );
+
+
+    if (
+        !offers ||
+        offers.length === 0
+    ) {
+
+        container.innerHTML = `
+
+            <div class="empty-state">
+
+                <i data-lucide="hand-coins"></i>
+
+                <h3>
+                    No offers yet
+                </h3>
+
+                <p>
+                    Your submitted offers will
+                    appear here.
+                </p>
+
+            </div>
+
+        `;
+
+        lucide.createIcons();
+
+        return;
+
+    }
+
+
+    container.innerHTML = `
+
+        <div
+            style="
+                overflow-x:auto;
+            "
+        >
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Produce</th>
+                        <th>Farmer</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${
+                        offers
+                            .map(
+                                offer => `
+
+                                    <tr>
+
+                                        <td>
+                                            ${escapeHtml(
+                                                offer.crop_name
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            ${escapeHtml(
+                                                offer.farmer_name ||
+                                                'Farmer'
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            ₹${Number(
+                                                offer.offered_price ||
+                                                0
+                                            ).toFixed(2)}
+                                            /
+                                            ${escapeHtml(
+                                                offer.unit ||
+                                                'kg'
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            ${Number(
+                                                offer.quantity ||
+                                                0
+                                            ).toFixed(2)}
+                                            ${escapeHtml(
+                                                offer.unit ||
+                                                'kg'
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            ${statusBadge(
+                                                offer.status
+                                            )}
+                                        </td>
+
+                                    </tr>
+
+                                `
+                            )
+                            .join('')
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    `;
+
+}
+
+
+// =====================================================
+// RENDER TRANSACTIONS
+// =====================================================
+
+function renderTransactions(
+    transactions
+) {
+
+    const container =
+        document.getElementById(
+            'transactionsContainer'
+        );
+
+
+    if (
+        !transactions ||
+        transactions.length === 0
+    ) {
+
+        container.innerHTML = `
+
+            <div class="empty-state">
+
+                <i data-lucide="receipt"></i>
+
+                <h3>
+                    No transactions yet
+                </h3>
+
+                <p>
+                    Your purchases will appear here
+                    after an offer is accepted.
+                </p>
+
+            </div>
+
+        `;
+
+        lucide.createIcons();
+
+        return;
+
+    }
+
+
+    container.innerHTML = `
+
+        <div
+            style="
+                overflow-x:auto;
+            "
+        >
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Produce</th>
+                        <th>Farmer</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${
+                        transactions
+                            .map(
+                                transaction => `
+
+                                    <tr>
+
+                                        <td>
+                                            #${Number(
+                                                transaction.id
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            ${escapeHtml(
+                                                transaction.crop_name
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            ${escapeHtml(
+                                                transaction.farmer_name ||
+                                                'Farmer'
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            ${Number(
+                                                transaction.quantity ||
+                                                0
+                                            ).toFixed(2)}
+                                            ${escapeHtml(
+                                                transaction.unit ||
+                                                'kg'
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            ₹${Number(
+                                                transaction.amount ||
+                                                0
+                                            ).toFixed(2)}
+                                        </td>
+
+                                        <td>
+                                            ${statusBadge(
+                                                transaction.status
+                                            )}
+                                        </td>
+
+                                    </tr>
+
+                                `
+                            )
+                            .join('')
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    `;
+
+}
+
+
+// =====================================================
+// STATUS BADGE
+// =====================================================
+
+function statusBadge(
+    status
+) {
+
+    const normalized =
+        String(
+            status ||
+            ''
+        ).toLowerCase();
+
+
+    let className =
+        'status-pending';
+
+
+    if (
+        normalized === 'accepted' ||
+        normalized === 'completed'
+    ) {
+
+        className =
+            normalized === 'completed'
+                ? 'status-completed'
+                : 'status-accepted';
+
+    }
+
+
+    if (
+        normalized === 'rejected' ||
+        normalized === 'cancelled'
+    ) {
+
+        className =
+            normalized === 'cancelled'
+                ? 'status-cancelled'
+                : 'status-rejected';
+
+    }
+
+
+    return `
+        <span
+            class="status-badge ${className}"
+        >
+            ${escapeHtml(
+                status || 'Unknown'
+            )}
+        </span>
+    `;
+
+}
+
+
+// =====================================================
+// SEARCH
+// =====================================================
+
+function applyFilters() {
+
+    if (
+        !dashboardData
+    ) {
+        return;
+    }
+
+
+    let produce =
+        [
+            ...(dashboardData.recentProduce || [])
+        ];
+
+
+    const search =
+        document
+            .getElementById(
+                'produceSearch'
+            )
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const quality =
+        document
+            .getElementById(
+                'qualityFilter'
+            )
+            .value;
+
+
+    const sort =
+        document
+            .getElementById(
+                'sortFilter'
+            )
+            .value;
+
+
+    if (search) {
+
+        produce =
+            produce.filter(
+                item => {
+
+                    const crop =
+                        String(
+                            item.crop_name ||
+                            ''
+                        ).toLowerCase();
+
+                    const farmer =
+                        String(
+                            item.farmer_name ||
+                            ''
+                        ).toLowerCase();
+
+                    return (
+                        crop.includes(search) ||
+                        farmer.includes(search)
+                    );
+
+                }
+            );
+
+    }
+
+
+    if (quality) {
+
+        produce =
+            produce.filter(
+                item =>
+                    String(
+                        item.quality ||
+                        ''
+                    ).toUpperCase() ===
+                    quality
+            );
+
+    }
+
+
+    if (
+        sort === 'price-low'
+    ) {
+
+        produce.sort(
+            (
+                a,
+                b
+            ) =>
+                Number(
+                    a.price_per_unit ||
+                    0
+                ) -
+                Number(
+                    b.price_per_unit ||
+                    0
+                )
+        );
+
+    }
+
+
+    if (
+        sort === 'price-high'
+    ) {
+
+        produce.sort(
+            (
+                a,
+                b
+            ) =>
+                Number(
+                    b.price_per_unit ||
+                    0
+                ) -
+                Number(
+                    a.price_per_unit ||
+                    0
+                )
+        );
+
+    }
+
+
+    if (
+        sort === 'quantity-high'
+    ) {
+
+        produce.sort(
+            (
+                a,
+                b
+            ) =>
+                Number(
+                    b.quantity ||
+                    0
+                ) -
+                Number(
+                    a.quantity ||
+                    0
+                )
+        );
+
+    }
+
+
+    drawMarketplaceCards(
+        produce
+    );
+
+}
+
+
+// =====================================================
+// SHOW MARKETPLACE
+// =====================================================
+
+function showMarketplace() {
+
+    const element =
+        document.getElementById(
+            'marketplace'
+        );
+
+    if (element) {
+
+        element.scrollIntoView({
+            behavior: 'smooth'
+        });
+
+    }
+
+}
+
+
+// =====================================================
+// LOGOUT
+// =====================================================
+
+function logout() {
+
+    localStorage.removeItem(
+        'agrilink_token'
+    );
+
+    localStorage.removeItem(
+        'agrilink_role'
+    );
+
+    localStorage.removeItem(
+        'agrilink_user'
+    );
+
+    localStorage.removeItem(
+        'agrilink_email'
+    );
+
+    localStorage.removeItem(
+        'agrilink_user_id'
+    );
+
+
+    window.location.href =
+        'index.html';
+
+}
+
+
+// =====================================================
+// HTML ESCAPE
+// =====================================================
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value ?? ''
+    )
+        .replace(
+            /&/g,
+            '&amp;'
+        )
+        .replace(
+            /</g,
+            '&lt;'
+        )
+        .replace(
+            />/g,
+            '&gt;'
+        )
+        .replace(
+            /"/g,
+            '&quot;'
+        )
+        .replace(
+            /'/g,
+            '&#039;'
+        );
+
+}
+
+
+// =====================================================
+// JAVASCRIPT STRING ESCAPE
+// =====================================================
+
+function escapeJs(
+    value
+) {
+
+    return String(
+        value ?? ''
+    )
+        .replace(
+            /\\/g,
+            '\\\\'
+        )
+        .replace(
+            /'/g,
+            "\\'"
+        )
+        .replace(
+            /\n/g,
+            '\\n'
+        )
+        .replace(
+            /\r/g,
+            '\\r'
+        );
+
+}
+
+
+// =====================================================
+// EVENT LISTENERS
+// =====================================================
+
+document
+    .getElementById(
+        'produceSearch'
+    )
+    .addEventListener(
+        'input',
+        applyFilters
+    );
+
+
+document
+    .getElementById(
+        'qualityFilter'
+    )
+    .addEventListener(
+        'change',
+        applyFilters
+    );
+
+
+document
+    .getElementById(
+        'sortFilter'
+    )
+    .addEventListener(
+        'change',
+        applyFilters
+    );
+
+
+document
+    .getElementById(
+        'globalSearch'
+    )
+    .addEventListener(
+        'input',
+        function () {
+
+            document
+                .getElementById(
+                    'produceSearch'
+                )
+                .value =
+                this.value;
+
+            applyFilters();
+
+        }
+    );
+
+
+// =====================================================
+// INITIAL LOAD
+// =====================================================
+
+lucide.createIcons();
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>

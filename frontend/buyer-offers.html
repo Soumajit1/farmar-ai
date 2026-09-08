@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>My Offers — AgriLink AI</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+
+.offer-actions {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.accept-counter-btn {
+    background:var(--color-primary);
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:7px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:12px;
+}
+
+.accept-counter-btn:hover {
+    opacity:0.9;
+}
+
+.reject-counter-btn {
+    background:white;
+    color:#e74c3c;
+    border:1px solid #e74c3c;
+    padding:8px 12px;
+    border-radius:7px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:12px;
+}
+
+.reject-counter-btn:hover {
+    background:#fff5f5;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="dashboard-layout">
+
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="sidebar-header">
+
+        <div class="sidebar-logo">
+
+            <i data-lucide="tractor"></i>
+
+            AgriLink AI
+
+        </div>
+
+    </div>
+
+
+    <nav class="nav-menu">
+
+        <a
+            href="dashboard-buyer.html"
+            class="nav-item"
+        >
+            Overview
+        </a>
+
+        <a
+            href="dashboard-buyer.html#marketplace"
+            class="nav-item"
+        >
+            Marketplace
+        </a>
+
+        <a
+            href="buyer-offers.html"
+            class="nav-item active"
+        >
+            My Offers
+        </a>
+
+        <a
+            href="buyer-transactions.html"
+            class="nav-item"
+        >
+            Transactions
+        </a>
+
+        <a
+            href="buyer-logistics.html"
+            class="nav-item"
+        >
+            Logistics
+        </a>
+
+    </nav>
+
+
+    <div class="sidebar-footer">
+
+        <a
+            href="#"
+            class="nav-item"
+            style="color:#e74c3c;padding:0;"
+            onclick="logout()"
+        >
+            Log Out
+        </a>
+
+    </div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main-content">
+
+
+<header class="topbar glass-panel">
+
+    <h2 class="page-title">
+        My Offers
+    </h2>
+
+
+    <div class="topbar-actions">
+
+        <button
+            id="notifBtn"
+            class="btn-secondary"
+            style="
+                padding:8px 12px;
+                display:flex;
+                align-items:center;
+                gap:8px;
+            "
+        >
+
+            <i
+                data-lucide="bell"
+                style="width:16px;height:16px;"
+            ></i>
+
+            Notifications
+
+        </button>
+
+
+        <div class="user-profile">
+
+            <div
+                class="avatar"
+                id="userAvatar"
+            >
+                B
+            </div>
+
+            <span
+                id="userName"
+                style="font-weight:500;"
+            >
+                Buyer
+            </span>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<div class="dashboard-container fade-in">
+
+
+<!-- STATISTICS -->
+
+<div
+    class="grid-cards"
+    style="margin-bottom:24px;"
+>
+
+    <div class="card-3d stat-card">
+
+        <div class="stat-header">
+            <span>Total Offers</span>
+        </div>
+
+        <div
+            class="stat-value"
+            id="totalOffers"
+        >
+            0
+        </div>
+
+    </div>
+
+
+    <div class="card-3d stat-card">
+
+        <div class="stat-header">
+            <span>Pending</span>
+        </div>
+
+        <div
+            class="stat-value"
+            id="pendingOffers"
+        >
+            0
+        </div>
+
+    </div>
+
+
+    <div class="card-3d stat-card">
+
+        <div class="stat-header">
+            <span>Accepted</span>
+        </div>
+
+        <div
+            class="stat-value"
+            id="acceptedOffers"
+            style="color:var(--color-accent);"
+        >
+            0
+        </div>
+
+    </div>
+
+
+    <div class="card-3d stat-card">
+
+        <div class="stat-header">
+            <span>Rejected</span>
+        </div>
+
+        <div
+            class="stat-value"
+            id="rejectedOffers"
+            style="color:#e74c3c;"
+        >
+            0
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- FILTERS -->
+
+<div
+    style="
+        display:flex;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-bottom:20px;
+    "
+>
+
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="Search produce, farmer..."
+        style="
+            padding:10px 14px;
+            border:1px solid #e0e0e0;
+            border-radius:8px;
+            flex:1;
+            min-width:200px;
+        "
+    >
+
+
+    <select
+        id="statusFilter"
+        style="
+            padding:10px 14px;
+            border:1px solid #e0e0e0;
+            border-radius:8px;
+        "
+    >
+
+        <option value="all">
+            All Status
+        </option>
+
+        <option value="pending">
+            Pending
+        </option>
+
+        <option value="accepted">
+            Accepted
+        </option>
+
+        <option value="rejected">
+            Rejected
+        </option>
+
+    </select>
+
+
+    <button
+        class="btn-secondary"
+        onclick="loadOffers()"
+        style="padding:10px 16px;"
+    >
+
+        <i data-lucide="refresh-cw"></i>
+
+        Refresh
+
+    </button>
+
+</div>
+
+
+<!-- TABLE -->
+
+<div class="dashboard-section glass-panel">
+
+    <div
+        class="section-title"
+        style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        "
+    >
+
+        <span>
+            My Offers
+        </span>
+
+
+        <span
+            id="loadingText"
+            style="
+                font-size:13px;
+                font-weight:400;
+                color:#777;
+            "
+        ></span>
+
+    </div>
+
+
+    <div style="overflow-x:auto;">
+
+        <table class="data-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Offer ID</th>
+
+                    <th>Produce</th>
+
+                    <th>Farmer / FPO</th>
+
+                    <th>Quantity</th>
+
+                    <th>Listed Price</th>
+
+                    <th>Buyer Offer</th>
+
+                    <th>Farmer Counter</th>
+
+                    <th>Final Sale</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                    <th>Date</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="offersTableBody">
+
+                <tr>
+
+                    <td
+                        colspan="11"
+                        style="
+                            text-align:center;
+                            padding:30px;
+                        "
+                    >
+                        Loading offers...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+</div>
+
+</main>
+
+</div>
+
+
+<script>
+
+const API_BASE =
+    'http://localhost:5000';
+
+
+let allOffers = [];
+
+
+// =====================================================
+// CURRENT BUYER
+// =====================================================
+
+const buyerId =
+    localStorage.getItem(
+        'agrilink_user_id'
+    );
+
+
+const user =
+    localStorage.getItem(
+        'agrilink_user'
+    ) || 'Buyer';
+
+
+document.getElementById(
+    'userName'
+).textContent = user;
+
+
+document.getElementById(
+    'userAvatar'
+).textContent =
+    user.charAt(0).toUpperCase();
+
+
+// =====================================================
+// LOAD OFFERS
+// =====================================================
+
+async function loadOffers() {
+
+    if (!buyerId) {
+
+        document.getElementById(
+            'offersTableBody'
+        ).innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="11"
+                    style="
+                        text-align:center;
+                        padding:30px;
+                        color:#e74c3c;
+                    "
+                >
+                    Buyer session not found.
+                    Please login again.
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    const loadingText =
+        document.getElementById(
+            'loadingText'
+        );
+
+
+    loadingText.textContent =
+        'Loading...';
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/buyer/offers/${buyerId}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                'Failed to load offers'
+            );
+
+        }
+
+
+        allOffers =
+            Array.isArray(data)
+                ? data
+                : (
+                    data.offers ||
+                    []
+                );
+
+
+        updateStatistics();
+
+        renderOffers();
+
+
+        loadingText.textContent =
+            `${allOffers.length} offer(s)`;
+
+
+    } catch (error) {
+
+        console.error(
+            'Load offers error:',
+            error
+        );
+
+
+        loadingText.textContent = '';
+
+
+        document.getElementById(
+            'offersTableBody'
+        ).innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="11"
+                    style="
+                        text-align:center;
+                        padding:30px;
+                        color:#e74c3c;
+                    "
+                >
+                    Failed to load offers.
+                    Make sure the backend is running.
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+// =====================================================
+// STATISTICS
+// =====================================================
+
+function updateStatistics() {
+
+    const total =
+        allOffers.length;
+
+
+    const pending =
+        allOffers.filter(
+            offer =>
+                String(
+                    offer.status
+                ).toLowerCase()
+                === 'pending'
+        ).length;
+
+
+    const accepted =
+        allOffers.filter(
+            offer =>
+                String(
+                    offer.status
+                ).toLowerCase()
+                === 'accepted'
+        ).length;
+
+
+    const rejected =
+        allOffers.filter(
+            offer =>
+                String(
+                    offer.status
+                ).toLowerCase()
+                === 'rejected'
+        ).length;
+
+
+    document.getElementById(
+        'totalOffers'
+    ).textContent = total;
+
+
+    document.getElementById(
+        'pendingOffers'
+    ).textContent = pending;
+
+
+    document.getElementById(
+        'acceptedOffers'
+    ).textContent = accepted;
+
+
+    document.getElementById(
+        'rejectedOffers'
+    ).textContent = rejected;
+
+}
+
+
+// =====================================================
+// RENDER
+// =====================================================
+
+function renderOffers() {
+
+    const search =
+        document.getElementById(
+            'searchInput'
+        ).value
+        .toLowerCase()
+        .trim();
+
+
+    const status =
+        document.getElementById(
+            'statusFilter'
+        ).value
+        .toLowerCase();
+
+
+    const filtered =
+        allOffers.filter(
+            offer => {
+
+                const crop =
+                    String(
+                        offer.crop_name ||
+                        ''
+                    ).toLowerCase();
+
+
+                const farmer =
+                    String(
+                        offer.farmer_name ||
+                        ''
+                    ).toLowerCase();
+
+
+                const offerStatus =
+                    String(
+                        offer.status ||
+                        ''
+                    ).toLowerCase();
+
+
+                const matchesSearch =
+                    !search ||
+                    crop.includes(search) ||
+                    farmer.includes(search);
+
+
+                const matchesStatus =
+                    status === 'all' ||
+                    offerStatus === status;
+
+
+                return (
+                    matchesSearch &&
+                    matchesStatus
+                );
+
+            }
+        );
+
+
+    const tbody =
+        document.getElementById(
+            'offersTableBody'
+        );
+
+
+    if (!filtered.length) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="11"
+                    style="
+                        text-align:center;
+                        padding:35px;
+                        color:#777;
+                    "
+                >
+                    No offers found.
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        filtered.map(
+            renderOfferRow
+        ).join('');
+
+
+    lucide.createIcons();
+
+}
+
+
+// =====================================================
+// OFFER ROW
+// =====================================================
+
+function renderOfferRow(
+    offer
+) {
+
+    const status =
+        String(
+            offer.status ||
+            'pending'
+        ).toLowerCase();
+
+
+    let badgeClass =
+        'badge-warning';
+
+
+    if (status === 'accepted') {
+
+        badgeClass =
+            'badge-success';
+
+    }
+
+
+    if (status === 'rejected') {
+
+        badgeClass =
+            'badge-danger';
+
+    }
+
+
+    const quantity =
+        Number(
+            offer.quantity ||
+            0
+        ).toFixed(2);
+
+
+    const unit =
+        escapeHtml(
+            offer.unit ||
+            'kg'
+        );
+
+
+    const listedPrice =
+        offer.price_per_unit != null
+
+            ? `₹${Number(
+                offer.price_per_unit
+            ).toFixed(2)}`
+
+            : '—';
+
+
+    const buyerOfferValue =
+        offer.buyer_offer_price != null
+
+            ? Number(
+                offer.buyer_offer_price
+            )
+
+            : Number(
+                offer.offered_price ||
+                0
+            );
+
+
+    const buyerOffer =
+        Number.isFinite(
+            buyerOfferValue
+        )
+
+            ? `₹${buyerOfferValue.toFixed(2)}`
+
+            : '—';
+
+
+    const counterOffer =
+        offer.counter_price != null
+
+            ? `₹${Number(
+                offer.counter_price
+            ).toFixed(2)}`
+
+            : '—';
+
+
+    const finalSale =
+        offer.final_price != null
+
+            ? `₹${Number(
+                offer.final_price
+            ).toFixed(2)}`
+
+            : '—';
+
+
+    const date =
+        formatDate(
+            offer.created_at
+        );
+
+
+    // =================================================
+    // BUYER ACTION
+    // =================================================
+
+    let action = '—';
+
+
+    if (
+        status === 'pending' &&
+        offer.counter_price != null &&
+        Number(
+            offer.counter_price
+        ) > 0
+    ) {
+
+        const counterPrice =
+            Number(
+                offer.counter_price
+            );
+
+
+        action = `
+
+            <div class="offer-actions">
+
+                <button
+                    class="accept-counter-btn"
+                    onclick="
+                        acceptCounterOffer(
+                            ${offer.id},
+                            ${counterPrice}
+                        )
+                    "
+                >
+
+                    Accept
+                    ₹${counterPrice.toFixed(2)}
+
+                </button>
+
+
+                <button
+                    class="reject-counter-btn"
+                    onclick="
+                        rejectCounterOffer(
+                            ${offer.id}
+                        )
+                    "
+                >
+
+                    Reject
+
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+
+    if (
+        status === 'accepted'
+    ) {
+
+        action = `
+
+            <span
+                style="
+                    color:var(--color-accent);
+                    font-weight:600;
+                "
+            >
+                Purchased
+
+            </span>
+
+        `;
+
+    }
+
+
+    return `
+
+        <tr>
+
+            <td>
+                OFR-${offer.id}
+            </td>
+
+
+            <td>
+
+                <strong>
+                    ${escapeHtml(
+                        offer.crop_name ||
+                        'Unknown'
+                    )}
+                </strong>
+
+
+                <div
+                    style="
+                        font-size:12px;
+                        color:#777;
+                        margin-top:3px;
+                    "
+                >
+                    ${escapeHtml(
+                        offer.quality ||
+                        ''
+                    )}
+                </div>
+
+            </td>
+
+
+            <td>
+                ${escapeHtml(
+                    offer.farmer_name ||
+                    'Unknown Farmer'
+                )}
+            </td>
+
+
+            <td>
+                ${quantity}
+                ${unit}
+            </td>
+
+
+            <td>
+                ${listedPrice}
+                /
+                ${unit}
+            </td>
+
+
+            <td>
+
+                <strong>
+                    ${buyerOffer}
+                </strong>
+
+                /
+                ${unit}
+
+            </td>
+
+
+            <td>
+
+                ${
+                    counterOffer === '—'
+
+                        ? '—'
+
+                        : `
+                            <strong>
+                                ${counterOffer}
+                            </strong>
+                            / ${unit}
+                          `
+                }
+
+            </td>
+
+
+            <td>
+
+                ${
+                    finalSale === '—'
+
+                        ? '—'
+
+                        : `
+                            <strong
+                                style="
+                                    color:var(--color-accent);
+                                "
+                            >
+                                ${finalSale}
+                            </strong>
+                            / ${unit}
+                          `
+                }
+
+            </td>
+
+
+            <td>
+
+                <span
+                    class="badge ${badgeClass}"
+                >
+                    ${capitalize(status)}
+                </span>
+
+            </td>
+
+
+            <td>
+                ${action}
+            </td>
+
+
+            <td>
+                ${date}
+            </td>
+
+        </tr>
+
+    `;
+
+}
+
+
+// =====================================================
+// ACCEPT COUNTER OFFER
+// =====================================================
+
+async function acceptCounterOffer(
+    offerId,
+    counterPrice
+) {
+
+    const confirmed =
+        confirm(
+            `Farmer countered at ₹${Number(
+                counterPrice
+            ).toFixed(2)}/kg.\n\n` +
+            `Do you want to purchase this produce at ₹${Number(
+                counterPrice
+            ).toFixed(2)}/kg?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/buyer/offers/${offerId}/accept-counter`,
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body: JSON.stringify({
+
+                        buyer_id:
+                            Number(buyerId)
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                'Failed to accept counter offer'
+            );
+
+        }
+
+
+        alert(
+            `Purchase successful!\n\n` +
+            `${data.purchase.crop_name}\n` +
+            `Quantity: ${data.purchase.quantity} ${data.purchase.unit}\n` +
+            `Final Price: ₹${Number(
+                data.purchase.final_price
+            ).toFixed(2)}/${data.purchase.unit}\n` +
+            `Total: ₹${Number(
+                data.purchase.total_amount
+            ).toFixed(2)}`
+        );
+
+
+        await loadOffers();
+
+
+    } catch (error) {
+
+        console.error(
+            'Accept counter error:',
+            error
+        );
+
+
+        alert(
+            error.message ||
+            'Failed to accept counter offer.'
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// REJECT COUNTER OFFER
+// =====================================================
+
+async function rejectCounterOffer(
+    offerId
+) {
+
+    const confirmed =
+        confirm(
+            'Are you sure you want to reject this counter offer?'
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/buyer/offers/${offerId}/reject-counter`,
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body: JSON.stringify({
+
+                        buyer_id:
+                            Number(buyerId)
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                'Failed to reject counter offer'
+            );
+
+        }
+
+
+        await loadOffers();
+
+
+    } catch (error) {
+
+        console.error(
+            'Reject counter error:',
+            error
+        );
+
+
+        alert(
+            error.message ||
+            'Failed to reject counter offer.'
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// HELPERS
+// =====================================================
+
+function formatDate(
+    dateValue
+) {
+
+    if (!dateValue) {
+        return '—';
+    }
+
+
+    const date =
+        new Date(dateValue);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return '—';
+
+    }
+
+
+    return date.toLocaleDateString(
+        'en-IN',
+        {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        }
+    );
+
+}
+
+
+function capitalize(
+    value
+) {
+
+    if (!value) {
+        return '';
+    }
+
+
+    return (
+        value.charAt(0).toUpperCase() +
+        value.slice(1)
+    );
+
+}
+
+
+function escapeHtml(
+    value
+) {
+
+    return String(value)
+
+        .replaceAll(
+            '&',
+            '&amp;'
+        )
+
+        .replaceAll(
+            '<',
+            '&lt;'
+        )
+
+        .replaceAll(
+            '>',
+            '&gt;'
+        )
+
+        .replaceAll(
+            '"',
+            '&quot;'
+        )
+
+        .replaceAll(
+            "'",
+            '&#039;'
+        );
+
+}
+
+
+// =====================================================
+// SEARCH / FILTER
+// =====================================================
+
+document.getElementById(
+    'searchInput'
+).addEventListener(
+    'input',
+    renderOffers
+);
+
+
+document.getElementById(
+    'statusFilter'
+).addEventListener(
+    'change',
+    renderOffers
+);
+
+
+// =====================================================
+// LOGOUT
+// =====================================================
+
+function logout() {
+
+    localStorage.removeItem(
+        'agrilink_token'
+    );
+
+    localStorage.removeItem(
+        'agrilink_role'
+    );
+
+    localStorage.removeItem(
+        'agrilink_user'
+    );
+
+    localStorage.removeItem(
+        'agrilink_email'
+    );
+
+    localStorage.removeItem(
+        'agrilink_user_id'
+    );
+
+
+    window.location.href =
+        'index.html';
+
+}
+
+
+// =====================================================
+// START
+// =====================================================
+
+lucide.createIcons();
+
+loadOffers();
+
+</script>
+
+
+<script src="js/dashboard.js?v=3"></script>
+
+</body>
+
+</html>

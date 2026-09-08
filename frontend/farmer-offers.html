@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Buyer Offers — AgriLink AI</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+    .offer-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .offer-toolbar-left {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .offer-search,
+    .offer-filter {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.05);
+        color: inherit;
+        outline: none;
+    }
+
+    .offer-search {
+        min-width: 240px;
+    }
+
+    .offer-filter {
+        min-width: 140px;
+    }
+
+    .offer-search:focus,
+    .offer-filter:focus {
+        border-color: var(--color-primary);
+    }
+
+    .offer-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .action-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        border: none;
+        cursor: pointer;
+        padding: 6px 10px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .accept-btn {
+        background: #d5f5e3;
+        color: #167a45;
+    }
+
+    .reject-btn {
+        background: #fadbd8;
+        color: #a93226;
+    }
+
+    .counter-btn {
+        background: #fdebd0;
+        color: #a85d00;
+    }
+
+    .action-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: var(--text-muted);
+    }
+
+    .loading-state {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-muted);
+    }
+
+    .offer-message {
+        max-width: 220px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .price-main {
+        font-weight: 600;
+    }
+
+    .price-listed {
+        display: block;
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 3px;
+    }
+
+    .toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 9999;
+        padding: 13px 18px;
+        border-radius: 10px;
+        background: #222;
+        color: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        display: none;
+        max-width: 350px;
+    }
+
+    .toast.success {
+        background: #16834b;
+    }
+
+    .toast.error {
+        background: #c0392b;
+    }
+
+    @media (max-width: 700px) {
+        .offer-search {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .offer-filter {
+            width: 100%;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i data-lucide="tractor"></i>
+                AgriLink AI
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+
+            <a href="dashboard-farmer.html" class="nav-item">
+                Overview
+            </a>
+
+            <a href="farmer-market-prices.html" class="nav-item">
+                Market Prices
+            </a>
+
+            <a href="farmer-produce.html" class="nav-item">
+                My Produce
+            </a>
+
+            <a href="farmer-offers.html" class="nav-item active">
+                Buyer Offers
+            </a>
+
+            <a href="farmer-transactions.html" class="nav-item">
+                Transactions
+            </a>
+
+            <a href="farmer-logistics.html" class="nav-item">
+                Logistics
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+
+            <a href="index.html"
+               id="logoutBtn"
+               class="nav-item"
+               style="color:#e74c3c;padding:0;">
+                Log Out
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <header class="topbar glass-panel">
+
+            <h2 class="page-title">
+                Buyer Offers
+            </h2>
+
+            <div class="topbar-actions">
+
+                <button id="notifBtn"
+                        class="btn-secondary"
+                        style="padding:8px 12px;display:flex;align-items:center;gap:8px;">
+
+                    <i data-lucide="bell"
+                       style="width:16px;height:16px;">
+                    </i>
+
+                    Notifications
+
+                </button>
+
+                <div class="user-profile">
+
+                    <div class="avatar"
+                         id="userAvatar">
+                        F
+                    </div>
+
+                    <span id="userName"
+                          style="font-weight:500;">
+                        Farmer
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="dashboard-container fade-in">
+
+
+            <!-- STATISTICS -->
+
+            <div class="grid-cards"
+                 style="margin-bottom:24px;">
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-header">
+
+                        <span>Total Offers</span>
+
+                        <i data-lucide="inbox"
+                           style="width:18px;height:18px;color:var(--color-primary);">
+                        </i>
+
+                    </div>
+
+                    <div class="stat-value"
+                         id="totalOffers">
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-header">
+
+                        <span>Pending</span>
+
+                        <i data-lucide="clock"
+                           style="width:18px;height:18px;color:#f39c12;">
+                        </i>
+
+                    </div>
+
+                    <div class="stat-value"
+                         id="pendingOffers"
+                         style="color:#f39c12;">
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-header">
+
+                        <span>Accepted</span>
+
+                        <i data-lucide="check-circle"
+                           style="width:18px;height:18px;color:var(--color-accent);">
+                        </i>
+
+                    </div>
+
+                    <div class="stat-value"
+                         id="acceptedOffers"
+                         style="color:var(--color-accent);">
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="card-3d stat-card">
+
+                    <div class="stat-header">
+
+                        <span>Rejected</span>
+
+                        <i data-lucide="x-circle"
+                           style="width:18px;height:18px;color:#e74c3c;">
+                        </i>
+
+                    </div>
+
+                    <div class="stat-value"
+                         id="rejectedOffers"
+                         style="color:#e74c3c;">
+                        0
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- OFFERS -->
+
+            <div class="dashboard-section glass-panel">
+
+                <div class="section-title">
+                    All Incoming Offers
+                </div>
+
+
+                <div class="offer-toolbar">
+
+                    <div class="offer-toolbar-left">
+
+                        <input
+                            type="text"
+                            id="searchInput"
+                            class="offer-search"
+                            placeholder="Search buyer or produce..."
+                        >
+
+                        <select
+                            id="statusFilter"
+                            class="offer-filter">
+
+                            <option value="all">
+                                All Status
+                            </option>
+
+                            <option value="pending">
+                                Pending
+                            </option>
+
+                            <option value="accepted">
+                                Accepted
+                            </option>
+
+                            <option value="rejected">
+                                Rejected
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <button
+                        id="refreshBtn"
+                        class="btn-secondary">
+
+                        <i data-lucide="refresh-cw"
+                           style="width:15px;height:15px;">
+                        </i>
+
+                        Refresh
+
+                    </button>
+
+                </div>
+
+
+                <div class="offer-table-wrapper">
+
+                    <table class="data-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Offer ID</th>
+
+                                <th>Buyer</th>
+
+                                <th>Produce</th>
+
+                                <th>Qty</th>
+
+                                <th>Offered Price</th>
+
+                                <th>Listed Price</th>
+
+                                <th>Message</th>
+
+                                <th>Status</th>
+
+                                <th>Actions</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="offersTableBody">
+
+                            <tr>
+
+                                <td colspan="9"
+                                    class="loading-state">
+
+                                    Loading offers...
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<div id="toast"
+     class="toast">
+</div>
+
+
+<script>
+
+const API_BASE = 'http://localhost:5000';
+
+let farmerId = localStorage.getItem('agrilink_user_id');
+
+let farmerUser = localStorage.getItem('agrilink_user');
+
+let offers = [];
+
+
+if (!farmerId) {
+
+    alert('Farmer session not found. Please login again.');
+
+    window.location.href = 'index.html';
+
+}
+
+
+function showToast(message, type = 'success') {
+
+    const toast = document.getElementById('toast');
+
+    toast.textContent = message;
+
+    toast.className = `toast ${type}`;
+
+    toast.style.display = 'block';
+
+    setTimeout(() => {
+
+        toast.style.display = 'none';
+
+    }, 3000);
+
+}
+
+
+function escapeHtml(value) {
+
+    if (value === null || value === undefined) {
+        return '';
+    }
+
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+
+function formatPrice(value) {
+
+    const number = Number(value || 0);
+
+    return '₹' + number.toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+}
+
+
+function formatDate(value) {
+
+    if (!value) {
+        return '-';
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return '-';
+    }
+
+    return date.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+
+}
+
+
+function statusBadge(status) {
+
+    if (status === 'accepted') {
+
+        return `<span class="badge badge-success">
+                    Accepted
+                </span>`;
+
+    }
+
+    if (status === 'rejected') {
+
+        return `<span class="badge badge-danger">
+                    Rejected
+                </span>`;
+
+    }
+
+    return `<span class="badge badge-warning">
+                Pending
+            </span>`;
+
+}
+
+
+function renderOffers() {
+
+    const tbody =
+        document.getElementById('offersTableBody');
+
+    const search =
+        document.getElementById('searchInput')
+            .value
+            .trim()
+            .toLowerCase();
+
+    const filter =
+        document.getElementById('statusFilter')
+            .value;
+
+
+    const filtered = offers.filter(offer => {
+
+        const buyer =
+            String(offer.buyer_name || '')
+                .toLowerCase();
+
+        const crop =
+            String(offer.crop_name || '')
+                .toLowerCase();
+
+        const status =
+            String(offer.status || '')
+                .toLowerCase();
+
+
+        const matchesSearch =
+            !search ||
+            buyer.includes(search) ||
+            crop.includes(search);
+
+
+        const matchesStatus =
+            filter === 'all' ||
+            status === filter;
+
+
+        return matchesSearch && matchesStatus;
+
+    });
+
+
+    if (filtered.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9">
+                    <div class="empty-state">
+                        No offers found.
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML = filtered.map(offer => {
+
+        const pending =
+            offer.status === 'pending';
+
+
+        return `
+            <tr>
+
+                <td>
+                    OFR-${String(offer.id).padStart(4, '0')}
+                </td>
+
+
+                <td>
+
+                    <strong>
+                        ${escapeHtml(
+                            offer.buyer_name || 'Buyer'
+                        )}
+                    </strong>
+
+                    <div style="font-size:11px;color:var(--text-muted);">
+                        ${escapeHtml(
+                            offer.buyer_email || ''
+                        )}
+                    </div>
+
+                </td>
+
+
+                <td>
+
+                    <strong>
+                        ${escapeHtml(
+                            offer.crop_name
+                        )}
+                    </strong>
+
+                    <div style="font-size:11px;color:var(--text-muted);">
+                        Quality:
+                        ${escapeHtml(
+                            offer.quality || 'N/A'
+                        )}
+                    </div>
+
+                </td>
+
+
+                <td>
+                    ${Number(offer.quantity || 0)}
+                    ${escapeHtml(offer.unit || 'kg')}
+                </td>
+
+
+                <td>
+
+                    <span class="price-main">
+                        ${formatPrice(
+                            offer.offered_price
+                        )}
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <span class="price-main">
+                        ${formatPrice(
+                            offer.listed_price
+                        )}
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <div
+                        class="offer-message"
+                        title="${escapeHtml(
+                            offer.message || ''
+                        )}">
+
+                        ${escapeHtml(
+                            offer.message || 'No message'
+                        )}
+
+                    </div>
+
+                    <div style="font-size:11px;color:var(--text-muted);">
+                        ${formatDate(
+                            offer.created_at
+                        )}
+                    </div>
+
+                </td>
+
+
+                <td>
+                    ${statusBadge(offer.status)}
+                </td>
+
+
+                <td>
+
+                    ${
+                        pending
+
+                        ?
+
+                        `<div class="action-group">
+
+                            <button
+                                class="action-btn accept-btn"
+                                onclick="acceptOffer(${offer.id})">
+
+                                Accept
+
+                            </button>
+
+                            <button
+                                class="action-btn counter-btn"
+                                onclick="counterOffer(${offer.id})">
+
+                                Counter
+
+                            </button>
+
+                            <button
+                                class="action-btn reject-btn"
+                                onclick="rejectOffer(${offer.id})">
+
+                                Reject
+
+                            </button>
+
+                        </div>`
+
+                        :
+
+                        `<span style="color:var(--text-muted);font-size:12px;">
+                            Processed
+                        </span>`
+                    }
+
+                </td>
+
+            </tr>
+        `;
+
+    }).join('');
+
+}
+
+
+async function loadStats() {
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE}/api/farmer/offers/${farmerId}/stats`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error || 'Failed to load statistics'
+            );
+        }
+
+
+        const stats = data.stats || {};
+
+
+        document.getElementById('totalOffers')
+            .textContent = stats.total || 0;
+
+        document.getElementById('pendingOffers')
+            .textContent = stats.pending || 0;
+
+        document.getElementById('acceptedOffers')
+            .textContent = stats.accepted || 0;
+
+        document.getElementById('rejectedOffers')
+            .textContent = stats.rejected || 0;
+
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+async function loadOffers() {
+
+    const tbody =
+        document.getElementById('offersTableBody');
+
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="9"
+                class="loading-state">
+                Loading offers...
+            </td>
+        </tr>
+    `;
+
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE}/api/farmer/offers/${farmerId}`
+        );
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error || 'Failed to load offers'
+            );
+
+        }
+
+
+        offers = data.offers || [];
+
+        renderOffers();
+
+        await loadStats();
+
+
+    } catch (error) {
+
+        console.error(
+            'Failed to load offers:',
+            error
+        );
+
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9">
+
+                    <div class="empty-state">
+
+                        <strong>
+                            Failed to load offers
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            ${escapeHtml(error.message)}
+                        </small>
+
+                    </div>
+
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+
+async function acceptOffer(offerId) {
+
+    const offer =
+        offers.find(item =>
+            Number(item.id) === Number(offerId)
+        );
+
+
+    if (!offer) {
+        return;
+    }
+
+
+    const confirmed = confirm(
+        `Accept this offer from ${offer.buyer_name || 'buyer'} for ${formatPrice(offer.offered_price)}?`
+    );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE}/api/farmer/offers/${offerId}/accept`,
+            {
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    farmerId: Number(farmerId)
+                })
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error || 'Failed to accept offer'
+            );
+
+        }
+
+
+        showToast(
+            'Offer accepted successfully.'
+        );
+
+
+        await loadOffers();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            error.message,
+            'error'
+        );
+
+    }
+
+}
+
+
+async function rejectOffer(offerId) {
+
+    const offer =
+        offers.find(item =>
+            Number(item.id) === Number(offerId)
+        );
+
+
+    if (!offer) {
+        return;
+    }
+
+
+    const confirmed = confirm(
+        `Reject the offer from ${offer.buyer_name || 'buyer'}?`
+    );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE}/api/farmer/offers/${offerId}/reject`,
+            {
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    farmerId: Number(farmerId)
+                })
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error || 'Failed to reject offer'
+            );
+
+        }
+
+
+        showToast(
+            'Offer rejected.'
+        );
+
+
+        await loadOffers();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            error.message,
+            'error'
+        );
+
+    }
+
+}
+
+
+async function counterOffer(offerId) {
+
+    const offer =
+        offers.find(item =>
+            Number(item.id) === Number(offerId)
+        );
+
+
+    if (!offer) {
+        return;
+    }
+
+
+    const currentPrice =
+        Number(offer.offered_price || 0);
+
+
+    const input = prompt(
+        `Enter your counter price per ${offer.unit || 'unit'}:`,
+        currentPrice.toFixed(2)
+    );
+
+
+    if (input === null) {
+        return;
+    }
+
+
+    const counterPrice =
+        Number(input);
+
+
+    if (!Number.isFinite(counterPrice) ||
+        counterPrice <= 0) {
+
+        showToast(
+            'Enter a valid price greater than zero.',
+            'error'
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE}/api/farmer/offers/${offerId}/counter`,
+            {
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+
+                    farmerId: Number(farmerId),
+
+                    counterPrice
+
+                })
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error || 'Failed to send counter offer'
+            );
+
+        }
+
+
+        showToast(
+            `Counter price updated to ${formatPrice(counterPrice)}.`
+        );
+
+
+        await loadOffers();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            error.message,
+            'error'
+        );
+
+    }
+
+}
+
+
+document
+    .getElementById('searchInput')
+    .addEventListener(
+        'input',
+        renderOffers
+    );
+
+
+document
+    .getElementById('statusFilter')
+    .addEventListener(
+        'change',
+        renderOffers
+    );
+
+
+document
+    .getElementById('refreshBtn')
+    .addEventListener(
+        'click',
+        loadOffers
+    );
+
+
+document
+    .getElementById('logoutBtn')
+    .addEventListener(
+        'click',
+        () => {
+
+            localStorage.removeItem('agrilink_token');
+            localStorage.removeItem('agrilink_role');
+            localStorage.removeItem('agrilink_user');
+            localStorage.removeItem('agrilink_email');
+            localStorage.removeItem('agrilink_user_id');
+
+        }
+    );
+
+
+const storedUser =
+    farmerUser || 'Farmer';
+
+
+document.getElementById('userName')
+    .textContent = storedUser;
+
+
+document.getElementById('userAvatar')
+    .textContent =
+        storedUser
+            .charAt(0)
+            .toUpperCase();
+
+
+loadOffers();
+
+
+if (window.lucide) {
+    lucide.createIcons();
+}
+
+</script>
+
+</body>
+</html>

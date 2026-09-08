@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Transactions — AgriLink AI</title>
+
+<link
+    rel="stylesheet"
+    href="css/style.css"
+>
+
+<link
+    rel="stylesheet"
+    href="css/dashboards.css"
+>
+
+<script
+    src="https://unpkg.com/lucide@latest">
+</script>
+
+
+<style>
+
+.transaction-toolbar {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:18px;
+
+    flex-wrap:wrap;
+
+}
+
+
+.transaction-controls {
+
+    display:flex;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+
+}
+
+
+.transaction-search,
+.transaction-filter {
+
+    padding:10px 14px;
+
+    border-radius:10px;
+
+    border:1px solid rgba(255,255,255,.12);
+
+    background:rgba(255,255,255,.05);
+
+    color:inherit;
+
+    outline:none;
+
+}
+
+
+.transaction-search {
+
+    min-width:240px;
+
+}
+
+
+.transaction-filter {
+
+    min-width:150px;
+
+}
+
+
+.transaction-table-wrapper {
+
+    overflow-x:auto;
+
+}
+
+
+.transaction-id {
+
+    font-weight:600;
+
+}
+
+
+.amount {
+
+    font-weight:700;
+
+}
+
+
+.empty-state {
+
+    text-align:center;
+
+    padding:50px 20px;
+
+    color:var(--text-muted);
+
+}
+
+
+.loading-state {
+
+    text-align:center;
+
+    padding:40px;
+
+    color:var(--text-muted);
+
+}
+
+
+.action-group {
+
+    display:flex;
+
+    gap:6px;
+
+    flex-wrap:wrap;
+
+}
+
+
+.action-btn {
+
+    border:none;
+
+    cursor:pointer;
+
+    padding:6px 10px;
+
+    border-radius:7px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+}
+
+
+.complete-btn {
+
+    background:#d5f5e3;
+
+    color:#167a45;
+
+}
+
+
+.cancel-btn {
+
+    background:#fadbd8;
+
+    color:#a93226;
+
+}
+
+
+.action-btn:disabled {
+
+    opacity:.5;
+
+    cursor:not-allowed;
+
+}
+
+
+.toast {
+
+    position:fixed;
+
+    right:24px;
+
+    bottom:24px;
+
+    z-index:9999;
+
+    padding:13px 18px;
+
+    border-radius:10px;
+
+    background:#222;
+
+    color:white;
+
+    display:none;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.25);
+
+}
+
+
+.toast.success {
+
+    background:#16834b;
+
+}
+
+
+.toast.error {
+
+    background:#c0392b;
+
+}
+
+
+@media(max-width:700px) {
+
+    .transaction-search {
+
+        width:100%;
+
+        min-width:0;
+
+    }
+
+    .transaction-filter {
+
+        width:100%;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-layout">
+
+
+<!-- =========================
+     SIDEBAR
+========================= -->
+
+<aside class="sidebar">
+
+
+    <div class="sidebar-header">
+
+        <div class="sidebar-logo">
+
+            <i data-lucide="tractor"></i>
+
+            AgriLink AI
+
+        </div>
+
+    </div>
+
+
+    <nav class="nav-menu">
+
+
+        <a
+            href="dashboard-farmer.html"
+            class="nav-item"
+        >
+            Overview
+        </a>
+
+
+        <a
+            href="farmer-market-prices.html"
+            class="nav-item"
+        >
+            Market Prices
+        </a>
+
+
+        <a
+            href="farmer-produce.html"
+            class="nav-item"
+        >
+            My Produce
+        </a>
+
+
+        <a
+            href="farmer-offers.html"
+            class="nav-item"
+        >
+            Buyer Offers
+        </a>
+
+
+        <a
+            href="farmer-transactions.html"
+            class="nav-item active"
+        >
+            Transactions
+        </a>
+
+
+        <a
+            href="farmer-logistics.html"
+            class="nav-item"
+        >
+            Logistics
+        </a>
+
+
+    </nav>
+
+
+    <div class="sidebar-footer">
+
+        <a
+            href="index.html"
+            id="logoutBtn"
+            class="nav-item"
+            style="color:#e74c3c;padding:0;"
+        >
+            Log Out
+        </a>
+
+    </div>
+
+
+</aside>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="main-content">
+
+
+<header class="topbar glass-panel">
+
+
+    <h2 class="page-title">
+
+        Transactions
+
+    </h2>
+
+
+    <div class="topbar-actions">
+
+
+        <button
+            id="refreshBtn"
+            class="btn-secondary"
+            style="
+                padding:8px 12px;
+                display:flex;
+                align-items:center;
+                gap:8px;
+            "
+        >
+
+            <i
+                data-lucide="refresh-cw"
+                style="
+                    width:16px;
+                    height:16px;
+                "
+            ></i>
+
+            Refresh
+
+        </button>
+
+
+        <div class="user-profile">
+
+
+            <div
+                class="avatar"
+                id="userAvatar"
+            >
+                F
+            </div>
+
+
+            <span
+                id="userName"
+                style="font-weight:500;"
+            >
+                Farmer
+            </span>
+
+
+        </div>
+
+
+    </div>
+
+
+</header>
+
+
+<div class="dashboard-container fade-in">
+
+
+<!-- =========================
+     STATISTICS
+========================= -->
+
+<div
+    class="grid-cards"
+    style="margin-bottom:24px;"
+>
+
+
+    <div class="card-3d stat-card">
+
+
+        <div class="stat-header">
+
+            <span>Total Transactions</span>
+
+            <i
+                data-lucide="receipt"
+                style="
+                    width:18px;
+                    height:18px;
+                    color:var(--color-primary);
+                "
+            ></i>
+
+        </div>
+
+
+        <div
+            class="stat-value"
+            id="totalTransactions"
+        >
+            0
+        </div>
+
+
+    </div>
+
+
+
+    <div class="card-3d stat-card">
+
+
+        <div class="stat-header">
+
+            <span>Pending</span>
+
+            <i
+                data-lucide="clock"
+                style="
+                    width:18px;
+                    height:18px;
+                    color:#f39c12;
+                "
+            ></i>
+
+        </div>
+
+
+        <div
+            class="stat-value"
+            id="pendingTransactions"
+            style="color:#f39c12;"
+        >
+            0
+        </div>
+
+
+    </div>
+
+
+
+    <div class="card-3d stat-card">
+
+
+        <div class="stat-header">
+
+            <span>Completed</span>
+
+            <i
+                data-lucide="check-circle"
+                style="
+                    width:18px;
+                    height:18px;
+                    color:var(--color-accent);
+                "
+            ></i>
+
+        </div>
+
+
+        <div
+            class="stat-value"
+            id="completedTransactions"
+            style="color:var(--color-accent);"
+        >
+            0
+        </div>
+
+
+    </div>
+
+
+
+    <div class="card-3d stat-card">
+
+
+        <div class="stat-header">
+
+            <span>Completed Earnings</span>
+
+            <i
+                data-lucide="indian-rupee"
+                style="
+                    width:18px;
+                    height:18px;
+                    color:var(--color-primary);
+                "
+            ></i>
+
+        </div>
+
+
+        <div
+            class="stat-value"
+            id="completedAmount"
+        >
+            ₹0
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================
+     TRANSACTIONS
+========================= -->
+
+<div class="dashboard-section glass-panel">
+
+
+    <div class="section-title">
+
+        Transaction History
+
+    </div>
+
+
+    <div class="transaction-toolbar">
+
+
+        <div class="transaction-controls">
+
+
+            <input
+                type="text"
+                id="searchInput"
+                class="transaction-search"
+                placeholder="Search buyer or crop..."
+            >
+
+
+            <select
+                id="statusFilter"
+                class="transaction-filter"
+            >
+
+                <option value="all">
+                    All Status
+                </option>
+
+                <option value="pending">
+                    Pending
+                </option>
+
+                <option value="completed">
+                    Completed
+                </option>
+
+                <option value="cancelled">
+                    Cancelled
+                </option>
+
+            </select>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="transaction-table-wrapper">
+
+
+        <table class="data-table">
+
+
+            <thead>
+
+                <tr>
+
+                    <th>Transaction</th>
+
+                    <th>Buyer</th>
+
+                    <th>Crop</th>
+
+                    <th>Quantity</th>
+
+                    <th>Amount</th>
+
+                    <th>Date</th>
+
+                    <th>Status</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="transactionsTableBody">
+
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="loading-state"
+                    >
+
+                        Loading transactions...
+
+                    </td>
+
+                </tr>
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+</div>
+
+
+</main>
+
+
+</div>
+
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+
+<script>
+
+
+const API_BASE =
+    'http://localhost:5000';
+
+
+const farmerId =
+    localStorage.getItem(
+        'agrilink_user_id'
+    );
+
+
+const farmerUser =
+    localStorage.getItem(
+        'agrilink_user'
+    );
+
+
+let transactions = [];
+
+
+
+if (!farmerId) {
+
+    alert(
+        'Farmer session not found. Please login again.'
+    );
+
+    window.location.href =
+        'index.html';
+
+}
+
+
+
+function escapeHtml(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return '';
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            '&amp;'
+        )
+
+        .replace(
+            /</g,
+            '&lt;'
+        )
+
+        .replace(
+            />/g,
+            '&gt;'
+        )
+
+        .replace(
+            /"/g,
+            '&quot;'
+        )
+
+        .replace(
+            /'/g,
+            '&#039;'
+        );
+
+}
+
+
+
+function formatPrice(value) {
+
+    return '₹' +
+        Number(
+            value || 0
+        ).toLocaleString(
+            'en-IN',
+            {
+                minimumFractionDigits:2,
+                maximumFractionDigits:2
+            }
+        );
+
+}
+
+
+
+function formatDate(value) {
+
+    if (!value) {
+
+        return '-';
+
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return '-';
+
+    }
+
+
+    return date.toLocaleDateString(
+        'en-IN',
+        {
+            day:'2-digit',
+            month:'short',
+            year:'numeric'
+        }
+    );
+
+}
+
+
+
+function statusBadge(status) {
+
+
+    if (
+        status === 'completed'
+    ) {
+
+        return `
+            <span class="badge badge-success">
+                Completed
+            </span>
+        `;
+
+    }
+
+
+    if (
+        status === 'cancelled'
+    ) {
+
+        return `
+            <span class="badge badge-danger">
+                Cancelled
+            </span>
+        `;
+
+    }
+
+
+    return `
+        <span class="badge badge-warning">
+            Pending
+        </span>
+    `;
+
+}
+
+
+
+function showToast(
+    message,
+    type = 'success'
+) {
+
+    const toast =
+        document.getElementById(
+            'toast'
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.className =
+        `toast ${type}`;
+
+
+    toast.style.display =
+        'block';
+
+
+    setTimeout(
+        () => {
+
+            toast.style.display =
+                'none';
+
+        },
+        3000
+    );
+
+}
+
+
+
+function renderTransactions() {
+
+
+    const tbody =
+        document.getElementById(
+            'transactionsTableBody'
+        );
+
+
+    const search =
+        document.getElementById(
+            'searchInput'
+        )
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const filter =
+        document.getElementById(
+            'statusFilter'
+        )
+        .value;
+
+
+    const filtered =
+        transactions.filter(
+            transaction => {
+
+
+                const buyer =
+                    String(
+                        transaction.buyer_name || ''
+                    )
+                    .toLowerCase();
+
+
+                const crop =
+                    String(
+                        transaction.crop_name || ''
+                    )
+                    .toLowerCase();
+
+
+                const status =
+                    String(
+                        transaction.status || ''
+                    )
+                    .toLowerCase();
+
+
+                const matchesSearch =
+                    !search ||
+                    buyer.includes(search) ||
+                    crop.includes(search);
+
+
+                const matchesStatus =
+                    filter === 'all' ||
+                    status === filter;
+
+
+                return (
+                    matchesSearch &&
+                    matchesStatus
+                );
+
+            }
+        );
+
+
+    if (
+        filtered.length === 0
+    ) {
+
+        tbody.innerHTML = `
+            <tr>
+
+                <td colspan="8">
+
+                    <div class="empty-state">
+
+                        No transactions found.
+
+                    </div>
+
+                </td>
+
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+
+    tbody.innerHTML =
+        filtered.map(
+            transaction => {
+
+
+                const pending =
+                    transaction.status ===
+                    'pending';
+
+
+                return `
+
+                    <tr>
+
+
+                        <td>
+
+                            <div class="transaction-id">
+
+                                TXN-${String(
+                                    transaction.id
+                                ).padStart(5,'0')}
+
+                            </div>
+
+                            <div
+                                style="
+                                    font-size:11px;
+                                    color:var(--text-muted);
+                                "
+                            >
+
+                                Offer #${transaction.offer_id}
+
+                            </div>
+
+                        </td>
+
+
+
+                        <td>
+
+                            <strong>
+
+                                ${escapeHtml(
+                                    transaction.buyer_name ||
+                                    'Buyer'
+                                )}
+
+                            </strong>
+
+
+                            <div
+                                style="
+                                    font-size:11px;
+                                    color:var(--text-muted);
+                                "
+                            >
+
+                                ${escapeHtml(
+                                    transaction.buyer_email ||
+                                    ''
+                                )}
+
+                            </div>
+
+                        </td>
+
+
+
+                        <td>
+
+                            <strong>
+
+                                ${escapeHtml(
+                                    transaction.crop_name ||
+                                    '-'
+                                )}
+
+                            </strong>
+
+
+                            <div
+                                style="
+                                    font-size:11px;
+                                    color:var(--text-muted);
+                                "
+                            >
+
+                                ${escapeHtml(
+                                    transaction.quality ||
+                                    ''
+                                )}
+
+                            </div>
+
+                        </td>
+
+
+
+                        <td>
+
+                            ${Number(
+                                transaction.quantity ||
+                                0
+                            )}
+
+                            ${escapeHtml(
+                                transaction.unit ||
+                                'kg'
+                            )}
+
+                        </td>
+
+
+
+                        <td>
+
+                            <span class="amount">
+
+                                ${formatPrice(
+                                    transaction.amount
+                                )}
+
+                            </span>
+
+                        </td>
+
+
+
+                        <td>
+
+                            ${formatDate(
+                                transaction.transaction_date
+                            )}
+
+                        </td>
+
+
+
+                        <td>
+
+                            ${statusBadge(
+                                transaction.status
+                            )}
+
+                        </td>
+
+
+
+                        <td>
+
+
+                            ${
+                                pending
+
+                                ?
+
+                                `
+
+                                <div
+                                    class="action-group"
+                                >
+
+                                    <button
+                                        class="action-btn complete-btn"
+                                        onclick="completeTransaction(${transaction.id})"
+                                    >
+
+                                        Complete
+
+                                    </button>
+
+
+                                    <button
+                                        class="action-btn cancel-btn"
+                                        onclick="cancelTransaction(${transaction.id})"
+                                    >
+
+                                        Cancel
+
+                                    </button>
+
+                                </div>
+
+                                `
+
+                                :
+
+                                `
+
+                                <span
+                                    style="
+                                        color:var(--text-muted);
+                                        font-size:12px;
+                                    "
+                                >
+
+                                    Processed
+
+                                </span>
+
+                                `
+
+                            }
+
+
+                        </td>
+
+
+                    </tr>
+
+                `;
+
+            }
+        )
+        .join('');
+
+}
+
+
+
+async function loadStats() {
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/farmer/transactions/${farmerId}/stats`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok
+        ) {
+
+            throw new Error(
+                data.error ||
+                'Failed to load statistics'
+            );
+
+        }
+
+
+        const stats =
+            data.stats || {};
+
+
+        document.getElementById(
+            'totalTransactions'
+        ).textContent =
+            stats.total || 0;
+
+
+        document.getElementById(
+            'pendingTransactions'
+        ).textContent =
+            stats.pending || 0;
+
+
+        document.getElementById(
+            'completedTransactions'
+        ).textContent =
+            stats.completed || 0;
+
+
+        document.getElementById(
+            'completedAmount'
+        ).textContent =
+            formatPrice(
+                stats.completedAmount
+            );
+
+
+    } catch (error) {
+
+
+        console.error(
+            'Stats error:',
+            error
+        );
+
+    }
+
+}
+
+
+
+async function loadTransactions() {
+
+
+    const tbody =
+        document.getElementById(
+            'transactionsTableBody'
+        );
+
+
+    tbody.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="8"
+                class="loading-state"
+            >
+
+                Loading transactions...
+
+            </td>
+
+        </tr>
+
+    `;
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/farmer/transactions/${farmerId}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok
+        ) {
+
+            throw new Error(
+                data.error ||
+                'Failed to load transactions'
+            );
+
+        }
+
+
+        transactions =
+            data.transactions || [];
+
+
+        renderTransactions();
+
+
+        await loadStats();
+
+
+    } catch (error) {
+
+
+        console.error(
+            'Transaction loading error:',
+            error
+        );
+
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td colspan="8">
+
+                    <div class="empty-state">
+
+                        <strong>
+                            Failed to load transactions
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            ${escapeHtml(
+                                error.message
+                            )}
+                        </small>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+
+async function completeTransaction(
+    transactionId
+) {
+
+
+    const confirmed =
+        confirm(
+            'Mark this transaction as completed?'
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/farmer/transactions/${transactionId}/complete`,
+                {
+
+                    method:'POST',
+
+                    headers:{
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body:JSON.stringify({
+
+                        farmerId:
+                            Number(farmerId)
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok
+        ) {
+
+            throw new Error(
+                data.error ||
+                'Failed to complete transaction'
+            );
+
+        }
+
+
+        showToast(
+            'Transaction completed successfully.'
+        );
+
+
+        await loadTransactions();
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        showToast(
+            error.message,
+            'error'
+        );
+
+    }
+
+}
+
+
+
+async function cancelTransaction(
+    transactionId
+) {
+
+
+    const confirmed =
+        confirm(
+            'Cancel this transaction?'
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/farmer/transactions/${transactionId}/cancel`,
+                {
+
+                    method:'POST',
+
+                    headers:{
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body:JSON.stringify({
+
+                        farmerId:
+                            Number(farmerId)
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok
+        ) {
+
+            throw new Error(
+                data.error ||
+                'Failed to cancel transaction'
+            );
+
+        }
+
+
+        showToast(
+            'Transaction cancelled.'
+        );
+
+
+        await loadTransactions();
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        showToast(
+            error.message,
+            'error'
+        );
+
+    }
+
+}
+
+
+
+document
+    .getElementById(
+        'searchInput'
+    )
+    .addEventListener(
+        'input',
+        renderTransactions
+    );
+
+
+
+document
+    .getElementById(
+        'statusFilter'
+    )
+    .addEventListener(
+        'change',
+        renderTransactions
+    );
+
+
+
+document
+    .getElementById(
+        'refreshBtn'
+    )
+    .addEventListener(
+        'click',
+        loadTransactions
+    );
+
+
+
+document
+    .getElementById(
+        'logoutBtn'
+    )
+    .addEventListener(
+        'click',
+        () => {
+
+            localStorage.removeItem(
+                'agrilink_token'
+            );
+
+            localStorage.removeItem(
+                'agrilink_role'
+            );
+
+            localStorage.removeItem(
+                'agrilink_user'
+            );
+
+            localStorage.removeItem(
+                'agrilink_email'
+            );
+
+            localStorage.removeItem(
+                'agrilink_user_id'
+            );
+
+        }
+    );
+
+
+
+const storedUser =
+    farmerUser || 'Farmer';
+
+
+document.getElementById(
+    'userName'
+).textContent =
+    storedUser;
+
+
+document.getElementById(
+    'userAvatar'
+).textContent =
+    storedUser
+        .charAt(0)
+        .toUpperCase();
+
+
+
+loadTransactions();
+
+
+
+if (window.lucide) {
+
+    lucide.createIcons();
+
+}
+
+</script>
+
+
+</body>
+
+</html>

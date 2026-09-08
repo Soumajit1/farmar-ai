@@ -1,0 +1,17 @@
+AGRI LINK AI - COMPLETE PROJECT
+
+This ZIP contains the complete project you uploaded, with the FPO backend route and FPO frontend integration added.
+
+IMPORTANT:
+1. Do NOT run index.html directly if you want database-backed functionality.
+2. Backend:
+   cd backend
+   node server.js
+
+3. Frontend:
+   Open frontend/index.html using your existing frontend method/server.
+
+4. The FPO API is:
+   http://localhost:5000/api/fpo/transactions/<FPO_USER_ID>
+
+The project files are otherwise preserved from your uploaded ZIP.

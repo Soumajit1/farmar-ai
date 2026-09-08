@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Logistics — Buyer — AgriLink AI</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboards.css">
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+
+<style>
+
+.shipment-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+
+.progress-track {
+    height: 6px;
+    background: #e8f5e9;
+    border-radius: 3px;
+    position: relative;
+    margin: 28px 0 8px;
+}
+
+
+.progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(
+        90deg,
+        var(--color-primary),
+        var(--color-accent)
+    );
+}
+
+
+.progress-dots {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: -8px;
+    width: 100%;
+}
+
+
+.progress-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow:
+        0 0 0 2px var(--color-primary);
+    background: var(--color-primary);
+}
+
+
+.progress-dot.inactive {
+    background: white;
+    box-shadow:
+        0 0 0 2px #ccc;
+}
+
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+
+.empty-logistics {
+    text-align: center;
+    padding: 45px 20px;
+    color: #777;
+}
+
+
+.empty-logistics i {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 12px;
+    color: var(--color-primary);
+}
+
+
+@media (max-width: 700px) {
+
+    .shipment-card {
+        padding: 18px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="dashboard-layout">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+
+            <div class="sidebar-logo">
+
+                <i data-lucide="tractor"></i>
+
+                AgriLink AI
+
+            </div>
+
+        </div>
+
+
+        <nav class="nav-menu">
+
+            <a
+                href="dashboard-buyer.html"
+                class="nav-item"
+            >
+                Overview
+            </a>
+
+            <a
+                href="dashboard-buyer.html#marketplace"
+                class="nav-item"
+            >
+                Marketplace
+            </a>
+
+            <a
+                href="buyer-offers.html"
+                class="nav-item"
+            >
+                My Offers
+            </a>
+
+            <a
+                href="buyer-transactions.html"
+                class="nav-item"
+            >
+                Transactions
+            </a>
+
+            <a
+                href="buyer-logistics.html"
+                class="nav-item active"
+            >
+                Logistics
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <a
+                href="#"
+                class="nav-item"
+                style="color:#e74c3c;padding:0;"
+                onclick="logout()"
+            >
+                Log Out
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+
+        <header class="topbar glass-panel">
+
+            <h2 class="page-title">
+                Logistics
+            </h2>
+
+
+            <div class="topbar-actions">
+
+                <button
+                    id="notifBtn"
+                    class="btn-secondary"
+                    style="
+                        padding:8px 12px;
+                        display:flex;
+                        align-items:center;
+                        gap:8px;
+                    "
+                >
+
+                    <i
+                        data-lucide="bell"
+                        style="width:16px;height:16px;"
+                    ></i>
+
+                    Notifications
+
+                </button>
+
+
+                <div class="user-profile">
+
+                    <div
+                        class="avatar"
+                        id="userAvatar"
+                    >
+                        B
+                    </div>
+
+                    <span
+                        id="userName"
+                        style="font-weight:500;"
+                    >
+                        Buyer
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="dashboard-container fade-in">
+
+
+            <!-- INBOUND DELIVERIES -->
+
+            <h3
+                style="
+                    font-family:'Outfit',sans-serif;
+                    margin-bottom:16px;
+                "
+            >
+                Inbound Deliveries
+            </h3>
+
+
+            <div id="activeShipments">
+
+                <div class="shipment-card">
+
+                    <div class="empty-logistics">
+
+                        <i data-lucide="truck"></i>
+
+                        <h3 style="margin-bottom:8px;">
+                            Loading shipments...
+                        </h3>
+
+                        <p>
+                            Please wait while we load your deliveries.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PAST RECEIPTS -->
+
+            <h3
+                style="
+                    font-family:'Outfit',sans-serif;
+                    margin:24px 0 16px;
+                "
+            >
+                Past Receipts
+            </h3>
+
+
+            <div class="dashboard-section glass-panel">
+
+                <div style="overflow-x:auto;">
+
+                    <table class="data-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Shipment ID</th>
+
+                                <th>From</th>
+
+                                <th>Produce</th>
+
+                                <th>Amount</th>
+
+                                <th>Received Date</th>
+
+                                <th>Status</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="pastReceiptsBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    style="
+                                        text-align:center;
+                                        padding:30px;
+                                    "
+                                >
+                                    Loading receipts...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+const API_BASE =
+    'http://localhost:5000';
+
+
+// =====================================================
+// CURRENT BUYER
+// =====================================================
+
+const buyerId =
+    localStorage.getItem(
+        'agrilink_user_id'
+    );
+
+
+const user =
+    localStorage.getItem(
+        'agrilink_user'
+    ) || 'Buyer';
+
+
+document.getElementById(
+    'userName'
+).textContent = user;
+
+
+document.getElementById(
+    'userAvatar'
+).textContent =
+    user.charAt(0).toUpperCase();
+
+
+// =====================================================
+// LOAD LOGISTICS
+// =====================================================
+
+async function loadLogistics() {
+
+    const activeContainer =
+        document.getElementById(
+            'activeShipments'
+        );
+
+    const receiptsBody =
+        document.getElementById(
+            'pastReceiptsBody'
+        );
+
+
+    if (!buyerId) {
+
+        activeContainer.innerHTML = `
+            <div class="shipment-card">
+
+                <div class="empty-logistics">
+
+                    <i data-lucide="user-x"></i>
+
+                    <h3 style="margin-bottom:8px;">
+                        Buyer session not found
+                    </h3>
+
+                    <p>
+                        Please login again to view logistics.
+                    </p>
+
+                </div>
+
+            </div>
+        `;
+
+
+        receiptsBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="6"
+                    style="
+                        text-align:center;
+                        padding:30px;
+                        color:#e74c3c;
+                    "
+                >
+                    Buyer session not found.
+                </td>
+            </tr>
+        `;
+
+
+        lucide.createIcons();
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/buyer/logistics/${buyerId}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                'Failed to load logistics'
+            );
+
+        }
+
+
+        const shipments =
+            Array.isArray(data)
+                ? data
+                : (
+                    data.shipments ||
+                    []
+                );
+
+
+        renderShipments(shipments);
+
+    } catch (error) {
+
+        console.error(
+            'Buyer logistics error:',
+            error
+        );
+
+
+        activeContainer.innerHTML = `
+            <div class="shipment-card">
+
+                <div class="empty-logistics">
+
+                    <i data-lucide="alert-circle"></i>
+
+                    <h3 style="margin-bottom:8px;">
+                        Failed to load logistics
+                    </h3>
+
+                    <p>
+                        Make sure the AgriLink AI backend is running.
+                    </p>
+
+                </div>
+
+            </div>
+        `;
+
+
+        receiptsBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="6"
+                    style="
+                        text-align:center;
+                        padding:30px;
+                        color:#e74c3c;
+                    "
+                >
+                    Failed to load logistics.
+                </td>
+            </tr>
+        `;
+
+
+        lucide.createIcons();
+
+    }
+
+}
+
+
+// =====================================================
+// RENDER SHIPMENTS
+// =====================================================
+
+function renderShipments(shipments) {
+
+    const activeContainer =
+        document.getElementById(
+            'activeShipments'
+        );
+
+
+    const receiptsBody =
+        document.getElementById(
+            'pastReceiptsBody'
+        );
+
+
+    const activeStatuses =
+        [
+            'pending',
+            'in_transit'
+        ];
+
+
+    const active =
+        shipments.filter(
+            shipment =>
+                activeStatuses.includes(
+                    String(
+                        shipment.shipment_status ||
+                        ''
+                    ).toLowerCase()
+                )
+        );
+
+
+    const delivered =
+        shipments.filter(
+            shipment =>
+                String(
+                    shipment.shipment_status ||
+                    ''
+                ).toLowerCase()
+                === 'delivered'
+        );
+
+
+    // =================================================
+    // ACTIVE SHIPMENTS
+    // =================================================
+
+    if (active.length === 0) {
+
+        activeContainer.innerHTML = `
+            <div class="shipment-card">
+
+                <div class="empty-logistics">
+
+                    <i data-lucide="truck"></i>
+
+                    <h3 style="margin-bottom:8px;">
+                        No active deliveries
+                    </h3>
+
+                    <p>
+                        You currently have no shipments in transit.
+                    </p>
+
+                </div>
+
+            </div>
+        `;
+
+    } else {
+
+        activeContainer.innerHTML =
+            active.map(
+                renderShipmentCard
+            ).join('');
+
+    }
+
+
+    // =================================================
+    // PAST RECEIPTS
+    // =================================================
+
+    if (delivered.length === 0) {
+
+        receiptsBody.innerHTML = `
+            <tr>
+
+                <td
+                    colspan="6"
+                    style="
+                        text-align:center;
+                        padding:35px;
+                        color:#777;
+                    "
+                >
+                    No past receipts yet.
+                </td>
+
+            </tr>
+        `;
+
+    } else {
+
+        receiptsBody.innerHTML =
+            delivered.map(
+                renderReceiptRow
+            ).join('');
+
+    }
+
+
+    lucide.createIcons();
+
+}
+
+
+// =====================================================
+// SHIPMENT CARD
+// =====================================================
+
+function renderShipmentCard(
+    shipment
+) {
+
+    const status =
+        String(
+            shipment.shipment_status ||
+            'pending'
+        ).toLowerCase();
+
+
+    const crop =
+        escapeHtml(
+            shipment.crop_name ||
+            'Produce'
+        );
+
+
+    const farmer =
+        escapeHtml(
+            shipment.farmer_name ||
+            'Farmer / FPO'
+        );
+
+
+    const quantity =
+        Number(
+            shipment.quantity || 0
+        ).toFixed(2);
+
+
+    const unit =
+        escapeHtml(
+            shipment.unit ||
+            'kg'
+        );
+
+
+    const shipmentId =
+        `SHP-${shipment.shipment_id}`;
+
+
+    const progress =
+        getProgress(status);
+
+
+    const statusLabel =
+        getStatusLabel(status);
+
+
+    const badgeClass =
+        getBadgeClass(status);
+
+
+    const estimated =
+        formatDate(
+            shipment.estimated_delivery
+        );
+
+
+    const created =
+        formatDate(
+            shipment.shipment_created_at
+        );
+
+
+    const pickup =
+        escapeHtml(
+            shipment.pickup_location ||
+            '—'
+        );
+
+
+    const delivery =
+        escapeHtml(
+            shipment.delivery_location ||
+            '—'
+        );
+
+
+    const transporter =
+        escapeHtml(
+            shipment.transporter ||
+            '—'
+        );
+
+
+    const tracking =
+        escapeHtml(
+            shipment.tracking_number ||
+            '—'
+        );
+
+
+    return `
+
+        <div class="shipment-card">
+
+            <div
+                style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-bottom:16px;
+                    flex-wrap:wrap;
+                    gap:8px;
+                "
+            >
+
+                <div>
+
+                    <h3 style="margin-bottom:4px;">
+                        Shipment #${shipmentId}
+                    </h3>
+
+                    <p
+                        style="
+                            font-size:13px;
+                            color:var(--text-muted);
+                        "
+                    >
+                        ${crop}
+                        (${quantity} ${unit})
+                        from ${farmer}
+                    </p>
+
+                </div>
+
+
+                <span
+                    class="badge ${badgeClass}"
+                >
+                    ${statusLabel}
+                </span>
+
+            </div>
+
+
+            <div class="progress-track">
+
+                <div
+                    class="progress-fill"
+                    style="width:${progress}%"
+                ></div>
+
+
+                <div class="progress-dots">
+
+                    <div
+                        class="progress-dot ${
+                            progress >= 33
+                                ? ''
+                                : 'inactive'
+                        }"
+                    ></div>
+
+                    <div
+                        class="progress-dot ${
+                            progress >= 66
+                                ? ''
+                                : 'inactive'
+                        }"
+                    ></div>
+
+                    <div
+                        class="progress-dot ${
+                            progress >= 100
+                                ? ''
+                                : 'inactive'
+                        }"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="progress-labels"
+                style="margin-top:6px;"
+            >
+
+                <span>
+                    Dispatched
+                    <br>
+                    <strong>
+                        ${created}
+                    </strong>
+                </span>
+
+
+                <span style="text-align:center;">
+                    In Transit
+                    <br>
+                    <strong>
+                        ${
+                            status === 'in_transit'
+                                ? 'Now'
+                                : 'Pending'
+                        }
+                    </strong>
+                </span>
+
+
+                <span style="text-align:right;">
+                    Expected
+                    <br>
+                    <strong>
+                        ${estimated}
+                    </strong>
+                </span>
+
+            </div>
+
+
+            <div
+                style="
+                    display:grid;
+                    grid-template-columns:repeat(4,1fr);
+                    gap:12px;
+                    margin-top:20px;
+                    padding-top:16px;
+                    border-top:1px solid #eee;
+                "
+            >
+
+                <div>
+
+                    <p
+                        style="
+                            font-size:12px;
+                            color:var(--text-muted);
+                        "
+                    >
+                        Transporter
+                    </p>
+
+                    <p style="font-weight:600;">
+                        ${transporter}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <p
+                        style="
+                            font-size:12px;
+                            color:var(--text-muted);
+                        "
+                    >
+                        Tracking
+                    </p>
+
+                    <p style="font-weight:600;">
+                        ${tracking}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <p
+                        style="
+                            font-size:12px;
+                            color:var(--text-muted);
+                        "
+                    >
+                        Pickup
+                    </p>
+
+                    <p style="font-weight:600;">
+                        ${pickup}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <p
+                        style="
+                            font-size:12px;
+                            color:var(--text-muted);
+                        "
+                    >
+                        Delivery
+                    </p>
+
+                    <p style="font-weight:600;">
+                        ${delivery}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+// =====================================================
+// RECEIPT ROW
+// =====================================================
+
+function renderReceiptRow(
+    shipment
+) {
+
+    const shipmentId =
+        `SHP-${shipment.shipment_id}`;
+
+
+    const farmer =
+        escapeHtml(
+            shipment.farmer_name ||
+            'Unknown Farmer'
+        );
+
+
+    const crop =
+        escapeHtml(
+            shipment.crop_name ||
+            'Produce'
+        );
+
+
+    const quantity =
+        Number(
+            shipment.quantity || 0
+        ).toFixed(2);
+
+
+    const unit =
+        escapeHtml(
+            shipment.unit ||
+            'kg'
+        );
+
+
+    const amount =
+        Number(
+            shipment.amount || 0
+        );
+
+
+    const receivedDate =
+        formatDate(
+            shipment.transaction_date ||
+            shipment.shipment_created_at
+        );
+
+
+    return `
+
+        <tr>
+
+            <td>
+                ${shipmentId}
+            </td>
+
+
+            <td>
+                ${farmer}
+            </td>
+
+
+            <td>
+                ${crop}
+                (${quantity} ${unit})
+            </td>
+
+
+            <td>
+                ₹${amount.toFixed(2)}
+            </td>
+
+
+            <td>
+                ${receivedDate}
+            </td>
+
+
+            <td>
+
+                <span
+                    class="badge badge-success"
+                >
+                    Received
+                </span>
+
+            </td>
+
+        </tr>
+
+    `;
+
+}
+
+
+// =====================================================
+// PROGRESS
+// =====================================================
+
+function getProgress(status) {
+
+    switch (status) {
+
+        case 'pending':
+            return 33;
+
+        case 'in_transit':
+            return 66;
+
+        case 'delivered':
+            return 100;
+
+        case 'cancelled':
+            return 0;
+
+        default:
+            return 33;
+
+    }
+
+}
+
+
+// =====================================================
+// STATUS LABEL
+// =====================================================
+
+function getStatusLabel(status) {
+
+    switch (status) {
+
+        case 'pending':
+            return 'Pending';
+
+        case 'in_transit':
+            return 'In Transit';
+
+        case 'delivered':
+            return 'Delivered';
+
+        case 'cancelled':
+            return 'Cancelled';
+
+        default:
+            return 'Pending';
+
+    }
+
+}
+
+
+// =====================================================
+// BADGE CLASS
+// =====================================================
+
+function getBadgeClass(status) {
+
+    switch (status) {
+
+        case 'delivered':
+            return 'badge-success';
+
+        case 'in_transit':
+            return 'badge-warning';
+
+        case 'cancelled':
+            return 'badge-danger';
+
+        case 'pending':
+        default:
+            return 'badge-warning';
+
+    }
+
+}
+
+
+// =====================================================
+// DATE
+// =====================================================
+
+function formatDate(
+    value
+) {
+
+    if (!value) {
+        return '—';
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return '—';
+
+    }
+
+
+    return date.toLocaleDateString(
+        'en-IN',
+        {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        }
+    );
+
+}
+
+
+// =====================================================
+// HTML ESCAPE
+// =====================================================
+
+function escapeHtml(
+    value
+) {
+
+    return String(value)
+
+        .replaceAll(
+            '&',
+            '&amp;'
+        )
+
+        .replaceAll(
+            '<',
+            '&lt;'
+        )
+
+        .replaceAll(
+            '>',
+            '&gt;'
+        )
+
+        .replaceAll(
+            '"',
+            '&quot;'
+        )
+
+        .replaceAll(
+            "'",
+            '&#039;'
+        );
+
+}
+
+
+// =====================================================
+// LOGOUT
+// =====================================================
+
+function logout() {
+
+    localStorage.removeItem(
+        'agrilink_token'
+    );
+
+    localStorage.removeItem(
+        'agrilink_role'
+    );
+
+    localStorage.removeItem(
+        'agrilink_user'
+    );
+
+    localStorage.removeItem(
+        'agrilink_email'
+    );
+
+    localStorage.removeItem(
+        'agrilink_user_id'
+    );
+
+
+    window.location.href =
+        'index.html';
+
+}
+
+
+// =====================================================
+// START
+// =====================================================
+
+lucide.createIcons();
+
+loadLogistics();
+
+</script>
+
+
+<script src="js/dashboard.js?v=3"></script>
+
+</body>
+
+</html>
